@@ -25,7 +25,6 @@ import io.github.davidebasile.contractautomata.converters.MSCAConverter;
 
 /**
  * Import JSon format (used by GraphLogicA tool).
- * The export operation is currently not supported.
  * 
  * @author Davide Basile
  *

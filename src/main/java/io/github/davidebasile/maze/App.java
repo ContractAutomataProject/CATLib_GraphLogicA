@@ -19,7 +19,6 @@ public class App
 //	#00FF00 green
 //	#000000 black
 //	#0000FF blue
-//	MSCA aut = new DataConverter().importMSCA(dir+"/src/main/java/io/github/davidebasile/maze/resources/maze.data");
 
 	public static void main( String[] args ) throws Exception
     {
@@ -58,9 +57,12 @@ public class App
 		MSCA comp = new CompositionFunction().apply(Arrays.asList(maze,driver), new StrongAgreement().negate(), 100);
 		
 		System.out.println("synthesis...");
-		MSCA strategy = new SynthesisOperator((x,t,bad)->Stream.of(x.getSource(),x.getTarget())
+		MSCA strategy = new SynthesisOperator(
+				(x,t,bad)->Stream.of(x.getSource(),x.getTarget())
 				.map(s->s.getState().get(0).getState())
-				.anyMatch(s->s.contains("#000000")),(x,t,bad)->false,new Agreement()).apply(comp);
+				.anyMatch(s->s.contains("#000000")),
+				(x,t,bad)->false,
+				new Agreement()).apply(comp);
 		
 
 		System.out.println("saving strategy.");
