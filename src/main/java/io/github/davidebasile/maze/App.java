@@ -14,12 +14,6 @@ import io.github.davidebasile.converters.JsonConverter;
 
 public class App 
 {
-
-//	#FFFFFF white
-//	#00FF00 green
-//	#000000 black
-//	#0000FF blue
-
 	public static void main( String[] args ) throws Exception
     {
         System.out.println( "Maze Demo!" );
