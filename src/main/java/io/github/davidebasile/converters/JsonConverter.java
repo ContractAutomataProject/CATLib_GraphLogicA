@@ -24,7 +24,7 @@ import io.github.davidebasile.contractautomata.automaton.transition.MSCATransiti
 import io.github.davidebasile.contractautomata.converters.MSCAConverter;
 
 /**
- * Import JSon format (used by VoxLogica tool).
+ * Import JSon format (used by GraphLogicA tool).
  * The export operation is currently not supported.
  * 
  * @author Davide Basile
@@ -117,12 +117,6 @@ public class JsonConverter implements MSCAConverter {
 		});
 		file.put("nodes", nodes);
 		
-//		JSONObject node = new JSONObject();
-//		node.put("id", "(0, 0, 0)");
-//		node.append("attr", "#00000");
-//		nodes.put(node);
-
-		
 		JSONArray arcs = new JSONArray();
 		aut.getTransition()
 		.forEach(t->{
@@ -132,13 +126,6 @@ public class JsonConverter implements MSCAConverter {
 			arcs.put(tr);
 		});
 		file.put("arcs", arcs);
-		
-		
-//		JSONObject tr = new JSONObject();
-//		tr.put("source", "(0, 0, 0)");
-//		tr.put("target", "(0, 0, 0)");
-//		arcs.put(tr);
-		
 		
 		if (filename=="")
 			throw new IllegalArgumentException("Empty file name");
