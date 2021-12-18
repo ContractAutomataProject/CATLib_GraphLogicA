@@ -50,8 +50,8 @@ public class JsonConverter implements MSCAConverter {
 					.mapToObj(atoms::getString)
 					.collect(Collectors.joining("_"));
 					return new CAState(
-							new ArrayList<BasicState>(Arrays.asList(new BasicState(label,isTopLeftCorner.test(n.getString("id")),isTopLeftCorner.test(n.getString("id"))))), 
-							0, 0);
+							new ArrayList<BasicState>(Arrays.asList(new BasicState(label,isTopLeftCorner.test(n.getString("id")),isTopLeftCorner.test(n.getString("id")))))//,0, 0
+							);
 				}));
 
 		JSONArray arcs = obj.getJSONArray("arcs");
