@@ -8,7 +8,7 @@ import io.github.davidebasile.contractautomata.automaton.MSCA;
 import io.github.davidebasile.contractautomata.converters.DataConverter;
 import io.github.davidebasile.contractautomata.converters.MSCAConverter;
 import io.github.davidebasile.contractautomatatest.MSCATest;
-import io.github.davidebasile.converters.JsonConverter;
+import io.github.davidebasile.converters.JSonConverter;
 
 public class JsonConverterTest {
 	private final DataConverter bdc = new DataConverter();
@@ -16,7 +16,7 @@ public class JsonConverterTest {
 	
 	@Test
 	public void importTest() throws Exception {
-		MSCAConverter jc = new JsonConverter();
+		MSCAConverter jc = new JSonConverter();
 		MSCA aut = jc.importMSCA(dir+"testgraph.json");
 	    bdc.exportMSCA(dir+"testgraph", aut);
 	    assertEquals(MSCATest.checkTransitions(aut, aut),true);
@@ -25,7 +25,7 @@ public class JsonConverterTest {
 	@Test
 	public void exportTest() throws Exception {
 		MSCA aut = bdc.importMSCA(dir+"strategy.data");
-		MSCAConverter jc = new JsonConverter();
+		MSCAConverter jc = new JSonConverter();
 		jc.exportMSCA(dir+"strategy.json",aut);
 	}
 
