@@ -1,6 +1,3 @@
-# CATLib_GraphLogicA
-
-The JSONConverter for importing graphs of <a href="https://github.com/vincenzoml/topochecker">topochecker</a> encoding bitmap images has been moved into this repository.
 
 # Video demo
 A video demo is available at https://www.youtube.com/watch?v=CNFDBpM1P5o.
@@ -9,3 +6,9 @@ and by incrementing the bound of the call to the composition method.
 
 All frames are stored in the folder 
 https://github.com/ContractAutomataProject/CATLib_GraphLogicA/tree/master/src/test/java/io/github/davidebasile/resources/video.
+
+
+# Miscellanea
+
+The JSONConverter for importing graphs of <a href="https://github.com/vincenzoml/topochecker">topochecker</a> encoding bitmap images has been moved into this repository.
+
