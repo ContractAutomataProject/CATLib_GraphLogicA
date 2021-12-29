@@ -12,7 +12,6 @@ import io.github.davidebasile.contractautomata.automaton.transition.MSCATransiti
 import io.github.davidebasile.contractautomata.converters.DataConverter;
 import io.github.davidebasile.contractautomata.converters.MSCAConverter;
 import io.github.davidebasile.contractautomata.operators.CompositionFunction;
-import io.github.davidebasile.contractautomata.operators.MpcSynthesisOperator;
 import io.github.davidebasile.contractautomata.requirements.StrongAgreement;
 import io.github.davidebasile.converters.PngConverter;
 
@@ -21,15 +20,15 @@ public class App
 	public static void main( String[] args ) throws Exception
 	{
 		System.out.println( "Maze Demo!" );
-		String dir = System.getProperty("user.dir")+"/src/test/java/io/github/davidebasile/resources/";
-
-		System.out.println("importing...");
+		String dir = System.getProperty("user.dir")+"/src/test/java/io/github/davidebasile/resources/video/";
 		PngConverter pdc = new PngConverter();
-		//		MSCA maze = pdc.importMSCA(dir+"maze2.png");
-
-
 		MSCAConverter dc = new DataConverter();
-		MSCA maze = dc.importMSCA(dir+"maze2.aut.data");
+		
+		System.out.println("importing...");
+		MSCA maze = pdc.importMSCA(dir+"maze2.png");
+		dc.exportMSCA(dir+"maze2.data",maze);
+
+		//MSCA maze = dc.importMSCA(dir+"maze2.aut.data");
 		MSCA driver = dc.importMSCA(dir+"driver.data");
 
 		System.out.println("resetting states...");
@@ -57,23 +56,32 @@ public class App
 				.collect(Collectors.toSet()));
 
 		System.out.println("composing...");
-		MSCA comp=new CompositionFunction().apply(Arrays.asList(maze,driver), 
-				new StrongAgreement().negate(),
-				555);//79);
-
-		System.out.println("synthesis...");		
-		//		MSCA strategy = new SynthesisOperator(
-		//				(x,t,bad)->Stream.of(x.getSource(),x.getTarget())
-		//				.map(s->s.getState().get(0).getState())
-		//				.anyMatch(s->s.contains("#000000")),
-		//				(x,t,bad)->false,
-		//				new Agreement()).apply(comp);			
-		MSCA strategy = new MpcSynthesisOperator(new StrongAgreement()).apply(comp);
-
-		System.out.println("saving ");
-
-		ImageIO.write(pdc.overlap(ImageIO.read(new File(dir+"maze2.png")),pdc.getBufferedImage(strategy)), 
-				"png",  
-				new File(dir+"maze2_strategy_overlay.png"));
+		
+		CompositionFunction cf = new CompositionFunction(Arrays.asList(maze,driver));
+		int bound=0;
+		do {
+			bound++;
+			MSCA comp=cf.apply( 
+					new StrongAgreement().negate(),
+					bound);//555);
+	
+//			System.out.println("synthesis...");
+//			MSCA strategy = new MpcSynthesisOperator(new StrongAgreement()).apply(comp);
+	
+			System.out.println("saving "+bound);
+	
+			ImageIO.write(pdc.overlap(ImageIO.read(new File(dir+"maze2.png")),pdc.getBufferedImage(comp)),//strategy)), 
+					"png",  
+					new File(dir+bound+".png"));//"maze2_strategy_overlay.png"));
+		} while (!cf.isFrontierEmpty());
 	}
 }
+
+
+
+//		MSCA strategy = new SynthesisOperator(
+//				(x,t,bad)->Stream.of(x.getSource(),x.getTarget())
+//				.map(s->s.getState().get(0).getState())
+//				.anyMatch(s->s.contains("#000000")),
+//				(x,t,bad)->false,
+//				new Agreement()).apply(comp);			
