@@ -1,21 +1,17 @@
 package io.github.davidebasile.maze;
 
-import java.time.Duration;
-import java.time.Instant;
-
 import io.github.davidebasile.contractautomata.automaton.MSCA;
 import io.github.davidebasile.contractautomata.converters.DataConverter;
 import io.github.davidebasile.contractautomata.converters.MSCAConverter;
 import io.github.davidebasile.contractautomata.operators.RelabelingOperator;
 import io.github.davidebasile.converters.JSonConverter;
-import io.github.davidebasile.converters.PngConverter;
 
 public class App2 
 {
 
 	private final static String dir = System.getProperty("user.dir")+"/src/test/java/io/github/davidebasile/resources/";
 
-	private final static PngConverter pdc = new PngConverter();
+	//private final static PngConverter pdc = new PngConverter();
 	private final static MSCAConverter dc = new DataConverter();
 	private final static JSonConverter jdc = new JSonConverter();
 
@@ -75,7 +71,7 @@ public class App2
 		//		dc.exportMSCA(dir+"twoagents_maze3", comp);
 		//		new JSonConverter().exportMSCA(dir+"twoagents_maze3", comp);
 
-		// generateImagesForEachState(dc.importMSCA(dir+"twoagents_maze3.data"));
+		generateImagesForEachState(dc.importMSCA(dir+"twoagents_maze3.data"));
 		//	new JSonConverter().exportMSCA(dir+"twoagents_maze3", dc.importMSCA(dir+"twoagents_maze3.data"));
 	}
 
