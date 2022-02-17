@@ -31,6 +31,12 @@ import io.github.davidebasile.contractautomata.converters.MSCAConverter;
  */
 public class JSonConverter implements MSCAConverter {
 	private static Predicate<String> isTopLeftCorner = s -> s.equals("0")||s.equals("(0, 0, 0)");
+	
+
+	public static final Function<CAState,String> getstate = ca -> 
+		ca.getState().stream()
+		.map(x->x.getState().split("_")[0].replaceAll(";", ","))
+		.collect(Collectors.joining(","));
 
 	@Override
 	public MSCA importMSCA(String filename) throws IOException {
@@ -106,8 +112,13 @@ public class JSonConverter implements MSCAConverter {
 	@Override
 	public void exportMSCA(String filename, MSCA aut) throws IOException {	
 		JSONObject file = new JSONObject();
-		final Function<CAState,String> getstate = ca -> ca.getState().get(0).getState().split("_")[0].replaceAll(";", ",");
-		final Function<CAState,String> getattr = ca -> ca.getState().get(0).getState().split("_")[1];
+			
+		final Function<CAState,String> getattr = ca -> 
+			ca.getState().stream()
+				.map(x->x.getState().split("_"))
+				.filter(x->x.length>1)
+				.map(x->x[1])
+				.collect(Collectors.joining(","));
 
 		JSONArray nodes = new JSONArray();
 		aut.getStates()
@@ -116,8 +127,8 @@ public class JSonConverter implements MSCAConverter {
 			node.put("id", getstate.apply(ca));
 			node.append("attr", getattr.apply(ca));
 			nodes.put(node);
-			
 		});
+		
 		file.put("nodes", nodes);
 		
 		JSONArray arcs = new JSONArray();
@@ -133,7 +144,7 @@ public class JSonConverter implements MSCAConverter {
 		if (filename=="")
 			throw new IllegalArgumentException("Empty file name");
 		
-		String suffix=(filename.endsWith(".json"))?"":"json";
+		String suffix=(filename.endsWith(".json"))?"":".json";
 		try (PrintWriter pr = new PrintWriter(filename+suffix))
 		{
 			file.write(pr);

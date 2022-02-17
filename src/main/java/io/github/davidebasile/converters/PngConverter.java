@@ -75,7 +75,7 @@ public class PngConverter implements MSCAConverter {
 
 	@Override
 	public void exportMSCA(String filename, MSCA aut) throws Exception {
-		String suffix=(filename.endsWith(".png"))?"":"png";
+		String suffix=(filename.endsWith(".png"))?"":".png";
 	    File output = new File(filename+suffix);
 	    ImageIO.write(getBufferedImage(aut), "jpg", output);
 	}
