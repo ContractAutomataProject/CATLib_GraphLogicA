@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -16,11 +17,11 @@ import java.util.stream.IntStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import io.github.davidebasile.contractautomata.automaton.MSCA;
+import io.github.davidebasile.contractautomata.automaton.ModalAutomaton;
 import io.github.davidebasile.contractautomata.automaton.label.CALabel;
 import io.github.davidebasile.contractautomata.automaton.state.BasicState;
 import io.github.davidebasile.contractautomata.automaton.state.CAState;
-import io.github.davidebasile.contractautomata.automaton.transition.MSCATransition;
+import io.github.davidebasile.contractautomata.automaton.transition.ModalTransition;
 import io.github.davidebasile.contractautomata.converters.MSCAConverter;
 
 /**
@@ -39,7 +40,7 @@ public class JSonConverter implements MSCAConverter {
 		.collect(Collectors.joining(","));
 
 	@Override
-	public MSCA importMSCA(String filename) throws IOException {
+	public ModalAutomaton<CALabel> importMSCA(String filename) throws IOException {
 
 		if (!filename.endsWith(".json"))
 			throw new IllegalArgumentException("Not a .json format");
@@ -66,13 +67,13 @@ public class JSonConverter implements MSCAConverter {
 
 		JSONArray arcs = obj.getJSONArray("arcs");
 
-		return new MSCA(IntStream.range(0, arcs.length())
+		return new ModalAutomaton<CALabel>(IntStream.range(0, arcs.length())
 				.mapToObj(arcs::getJSONObject)
-				.map(n-> new MSCATransition(
+				.map(n-> new ModalTransition<List<BasicState>,List<String>,CAState,CALabel>(
 						id2ct.get(n.getString("source")),
 						new CALabel(1,0,computeLabel(id2ct.get(n.getString("source")),id2ct.get(n.getString("target")))),
 						id2ct.get(n.getString("target")),
-						MSCATransition.Modality.PERMITTED))
+						ModalTransition.Modality.PERMITTED))
 				.collect(Collectors.toSet()));
 	}
 	
@@ -110,7 +111,7 @@ public class JSonConverter implements MSCAConverter {
 	}
 	
 	@Override
-	public void exportMSCA(String filename, MSCA aut) throws IOException {	
+	public void exportMSCA(String filename, ModalAutomaton<CALabel> aut) throws IOException {	
 		JSONObject file = new JSONObject();
 			
 		final Function<CAState,String> getattr = ca -> 

@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -15,17 +16,17 @@ import java.util.stream.IntStream;
 
 import javax.imageio.ImageIO;
 
-import io.github.davidebasile.contractautomata.automaton.MSCA;
+import io.github.davidebasile.contractautomata.automaton.ModalAutomaton;
 import io.github.davidebasile.contractautomata.automaton.label.CALabel;
 import io.github.davidebasile.contractautomata.automaton.state.BasicState;
 import io.github.davidebasile.contractautomata.automaton.state.CAState;
-import io.github.davidebasile.contractautomata.automaton.transition.MSCATransition;
+import io.github.davidebasile.contractautomata.automaton.transition.ModalTransition;
 import io.github.davidebasile.contractautomata.converters.MSCAConverter;
 
 public class PngConverter implements MSCAConverter {
 
 	@Override
-	public MSCA importMSCA(String filename) throws Exception {
+	public ModalAutomaton<CALabel> importMSCA(String filename) throws Exception {
 		if (!filename.endsWith(".png"))
 			throw new IllegalArgumentException("Not a .png format");
 		BufferedImage img = ImageIO.read(new File(filename));
@@ -38,13 +39,13 @@ public class PngConverter implements MSCAConverter {
 		.flatMap(Function.identity())
 		.collect(Collectors.toSet());
 		
-		Set<MSCATransition> tr = sc.stream()
+		Set<ModalTransition<List<BasicState>,List<String>,CAState,CALabel>> tr = sc.stream()
 				.flatMap(s->getTransitions(s,sc,img.getWidth(),img.getHeight()).stream())
 				.collect(Collectors.toSet());
-		return new MSCA(tr);
+		return new ModalAutomaton<CALabel>(tr);
 	}
 	
-	private Set<MSCATransition> getTransitions(CAState source, Set<CAState> states, int max_width, int max_height) {
+	private Set<ModalTransition<List<BasicState>,List<String>,CAState,CALabel>> getTransitions(CAState source, Set<CAState> states, int max_width, int max_height) {
 		String regex = "\\(([0-9]*);\\s([0-9]*);\\s([0-9]*)\\)(.)*";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(source.getState().get(0).getState());
@@ -68,19 +69,19 @@ public class PngConverter implements MSCAConverter {
 		.map(e->states.parallelStream()
 				//.peek(ca->System.out.println(ca.getState().get(0).getState().split("_")[0]+"   "+e.getKey()))
 				.filter(ca->ca.getState().get(0).getState().split("_")[0].equals(e.getKey()))
-				.map(ca->new MSCATransition(source,new CALabel(1,0,e.getValue()),ca,MSCATransition.Modality.PERMITTED))
+				.map(ca->new ModalTransition<List<BasicState>,List<String>,CAState,CALabel>(source,new CALabel(1,0,e.getValue()),ca,ModalTransition.Modality.PERMITTED))
 				.findAny().orElseThrow(RuntimeException::new))
 		.collect(Collectors.toSet());
 	}
 
 	@Override
-	public void exportMSCA(String filename, MSCA aut) throws Exception {
+	public void exportMSCA(String filename, ModalAutomaton<CALabel> aut) throws Exception {
 		String suffix=(filename.endsWith(".png"))?"":".png";
 	    File output = new File(filename+suffix);
 	    ImageIO.write(getBufferedImage(aut), "jpg", output);
 	}
 
-	public BufferedImage getBufferedImage(MSCA aut) {
+	public BufferedImage getBufferedImage(ModalAutomaton<CALabel> aut) {
 		final Function<CAState,String> getstate = ca -> ca.getState().get(0).getState().split("_")[0];
 		final Function<CAState,String> getattr = ca -> ca.getState().get(0).getState().split("_")[1];
 		

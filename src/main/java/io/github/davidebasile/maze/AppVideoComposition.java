@@ -2,16 +2,19 @@ package io.github.davidebasile.maze;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
-import io.github.davidebasile.contractautomata.automaton.MSCA;
+import io.github.davidebasile.contractautomata.automaton.ModalAutomaton;
 import io.github.davidebasile.contractautomata.automaton.label.CALabel;
-import io.github.davidebasile.contractautomata.automaton.transition.MSCATransition;
+import io.github.davidebasile.contractautomata.automaton.state.BasicState;
+import io.github.davidebasile.contractautomata.automaton.state.CAState;
+import io.github.davidebasile.contractautomata.automaton.transition.ModalTransition;
 import io.github.davidebasile.contractautomata.converters.DataConverter;
 import io.github.davidebasile.contractautomata.converters.MSCAConverter;
-import io.github.davidebasile.contractautomata.operators.CompositionFunction;
+import io.github.davidebasile.contractautomata.operators.MSCACompositionFunction;
 import io.github.davidebasile.contractautomata.requirements.StrongAgreement;
 import io.github.davidebasile.converters.PngConverter;
 
@@ -25,11 +28,11 @@ public class AppVideoComposition
 		MSCAConverter dc = new DataConverter();
 		
 		System.out.println("importing...");
-		MSCA maze = pdc.importMSCA(dir+"maze2.png");
+		ModalAutomaton<CALabel> maze = pdc.importMSCA(dir+"maze2.png");
 		dc.exportMSCA(dir+"maze2.data",maze);
 
 		//MSCA maze = dc.importMSCA(dir+"maze2.aut.data");
-		MSCA driver = dc.importMSCA(dir+"driver.data");
+		ModalAutomaton<CALabel> driver = dc.importMSCA(dir+"driver.data");
 
 		System.out.println("resetting states...");
 		//reset initial state
@@ -51,19 +54,18 @@ public class AppVideoComposition
 		//set forbidden states
 		maze.getTransition().addAll(maze.getStates().parallelStream()
 				.filter(ca->ca.getState().get(0).getState().contains("#000000"))
-				.map(ca->new MSCATransition(ca,new CALabel(1,0,"?forbidden"),ca,
-						MSCATransition.Modality.URGENT))
+				.map(ca->new ModalTransition<List<BasicState>,List<String>,CAState,CALabel>(ca,new CALabel(1,0,"?forbidden"),ca,
+						ModalTransition.Modality.URGENT))
 				.collect(Collectors.toSet()));
 
 		System.out.println("composing...");
 		
-		CompositionFunction cf = new CompositionFunction(Arrays.asList(maze,driver));
+		MSCACompositionFunction cf = new MSCACompositionFunction(Arrays.asList(maze,driver),
+				new StrongAgreement().negate());
 		int bound=0;
 		do {
 			bound++;
-			MSCA comp=cf.apply( 
-					new StrongAgreement().negate(),
-					bound);//555);
+			ModalAutomaton<CALabel> comp=cf.apply(bound);//555);
 	
 //			System.out.println("synthesis...");
 //			MSCA strategy = new MpcSynthesisOperator(new StrongAgreement()).apply(comp);

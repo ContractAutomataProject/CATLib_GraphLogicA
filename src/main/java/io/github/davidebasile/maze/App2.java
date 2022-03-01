@@ -1,6 +1,7 @@
 package io.github.davidebasile.maze;
 
-import io.github.davidebasile.contractautomata.automaton.MSCA;
+import io.github.davidebasile.contractautomata.automaton.ModalAutomaton;
+import io.github.davidebasile.contractautomata.automaton.label.CALabel;
 import io.github.davidebasile.contractautomata.converters.DataConverter;
 import io.github.davidebasile.contractautomata.converters.MSCAConverter;
 import io.github.davidebasile.contractautomata.operators.RelabelingOperator;
@@ -84,15 +85,15 @@ public class App2
 	 * @param aut
 	 * @throws Exception
 	 */
-	private static void generateImagesForEachState(MSCA aut) throws Exception {
-		MSCA maze = dc.importMSCA(dir+"maze3.data");				
+	private static void generateImagesForEachState(ModalAutomaton<CALabel> aut) throws Exception {
+		ModalAutomaton<CALabel> maze = dc.importMSCA(dir+"maze3.data");				
 		
 		aut.getStates().parallelStream()
 		.forEach(aut_s->{
 			final String s1 = aut_s.getState().get(0).getState().split("_")[0];
 			final String s2 = aut_s.getState().get(1).getState().split("_")[0];
 
-			MSCA mazewithagents = new RelabelingOperator(s->
+			ModalAutomaton<CALabel> mazewithagents = new RelabelingOperator<CALabel>(CALabel::new, s->
 			s.split("_")[0].equals(s1)?s.split("_")[0]+"_#FF0000"
 					:s.split("_")[0].equals(s2)?s.split("_")[0]+"_#00FF00"
 							:s)

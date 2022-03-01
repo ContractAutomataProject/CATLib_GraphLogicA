@@ -9,7 +9,8 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 
-import io.github.davidebasile.contractautomata.automaton.MSCA;
+import io.github.davidebasile.contractautomata.automaton.ModalAutomaton;
+import io.github.davidebasile.contractautomata.automaton.label.CALabel;
 import io.github.davidebasile.contractautomata.converters.DataConverter;
 import io.github.davidebasile.contractautomata.converters.MSCAConverter;
 import io.github.davidebasile.contractautomatatest.MSCATest;
@@ -24,15 +25,15 @@ public class PngConverterTest {
 
 	@Test 
 	public void importTest() throws Exception {
-		MSCA aut = pdc.importMSCA(dir+"maze.png");
-		MSCA test = jc.importMSCA(dir+"maze.json");
+		ModalAutomaton<CALabel> aut = pdc.importMSCA(dir+"maze.png");
+		ModalAutomaton<CALabel> test = jc.importMSCA(dir+"maze.json");
 		bdc.exportMSCA(dir+"maze_imported.data", aut);
 		assertTrue(MSCATest.checkTransitions(aut, test));
 	}
 	
 	@Test
 	public void exportTest() throws Exception {
-		MSCA aut = bdc.importMSCA(dir+"maze.data");
+		ModalAutomaton<CALabel> aut = bdc.importMSCA(dir+"maze.data");
 		pdc.exportMSCA(dir+"maze_export.png",aut);
 
 	}
