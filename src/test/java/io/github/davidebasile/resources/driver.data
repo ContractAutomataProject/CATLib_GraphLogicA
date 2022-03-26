@@ -1,8 +1,0 @@
-Rank: 1
-Initial state: [0]
-Final states: [[0]]
-Transitions: 
-([0],[!goright],[0])
-([0],[!goleft],[0])
-([0],[!goup],[0])
-([0],[!godown],[0])
