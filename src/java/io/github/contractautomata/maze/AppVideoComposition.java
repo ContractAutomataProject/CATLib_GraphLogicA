@@ -7,8 +7,8 @@ import io.github.contractautomata.catlib.automaton.label.action.RequestAction;
 import io.github.contractautomata.catlib.automaton.state.State;
 import io.github.contractautomata.catlib.automaton.transition.ModalTransition;
 import io.github.contractautomata.catlib.converters.AutDataConverter;
-import io.github.contractautomata.catlib.operators.MSCACompositionFunction;
-import io.github.contractautomata.catlib.operators.RelabelingOperator;
+import io.github.contractautomata.catlib.operations.MSCACompositionFunction;
+import io.github.contractautomata.catlib.operations.RelabelingOperator;
 import io.github.contractautomata.catlib.requirements.StrongAgreement;
 import io.github.contractautomata.maze.converters.PngConverter;
 
