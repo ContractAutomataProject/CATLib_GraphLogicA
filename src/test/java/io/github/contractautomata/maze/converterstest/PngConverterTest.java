@@ -24,7 +24,7 @@ public class PngConverterTest {
 	private final PngConverter pdc = new PngConverter();
 	private final JSonConverter jc = new JSonConverter();
 	private final String dir = Paths.get(System.getProperty("user.dir")).getParent()
-			+"/CATLib_PngConverter/src/test/java/io/github/contractautomata/resources/";
+			+"/CATLib_PngConverter/src/test/java/io/github/contractautomata/maze/resources/";
 
 	@Test 
 	public void importTest() throws Exception {
@@ -52,6 +52,8 @@ public class PngConverterTest {
 
 	@Test
 	public void importJsonExportPng() throws Exception {
+		pdc.exportMSCA(dir + "twoagentsimages/(0, 1, 0),(1, 0, 0),0.png", 
+				jc.importMSCA(dir + "twoagentsimages/(0, 1, 0),(1, 0, 0),0.json"));
 	}
 	
 }

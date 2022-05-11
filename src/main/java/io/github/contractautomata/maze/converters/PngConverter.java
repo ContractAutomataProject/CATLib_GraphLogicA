@@ -79,7 +79,7 @@ public class PngConverter implements AutConverter<Automaton<String, Action, Stat
 	public void exportMSCA(String filename, Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut) throws IOException {
 		String suffix=(filename.endsWith(".png"))?"":".png";
 	    File output = new File(filename+suffix);
-	    ImageIO.write(getBufferedImage(aut), "jpg", output);
+	    ImageIO.write(getBufferedImage(aut), "png", output);
 	}
 
 	public BufferedImage getBufferedImage(Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut) {

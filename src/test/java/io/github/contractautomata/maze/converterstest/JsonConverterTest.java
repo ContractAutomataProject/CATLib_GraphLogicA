@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 public class JsonConverterTest {
 	private final AutDataConverter<CALabel> bdc = new AutDataConverter<>(CALabel::new);
 	private final String dir = Paths.get(System.getProperty("user.dir")).getParent()
-			+"/CATLib_PngConverter/test/java/io/github/contractautomata/maze/resources/";
+			+"/CATLib_PngConverter/src/test/java/io/github/contractautomata/maze/resources/";
 	
 	@Test
 	public void importTest() throws Exception {

@@ -6,16 +6,18 @@ import io.github.contractautomata.catlib.automaton.label.action.Action;
 import io.github.contractautomata.catlib.automaton.state.BasicState;
 import io.github.contractautomata.catlib.automaton.state.State;
 import io.github.contractautomata.catlib.automaton.transition.ModalTransition;
+import io.github.contractautomata.catlib.converters.AutConverter;
 import io.github.contractautomata.catlib.converters.AutDataConverter;
 import io.github.contractautomata.catlib.operations.RelabelingOperator;
 import io.github.contractautomata.maze.converters.JSonConverter;
+import io.github.contractautomata.maze.converters.PngConverter;
 
 public class AppMazeTwoAgents
 {
 
 	private final static String dir = System.getProperty("user.dir")+"/src/test/java/io/github/contractautomata/maze/resources/";
 
-	//private final static PngConverter pdc = new PngConverter();
+	private final static PngConverter pdc = new PngConverter();
 	private final static AutDataConverter<CALabel> dc = new AutDataConverter<>(CALabel::new);
 	private final static JSonConverter jdc = new JSonConverter();
 
@@ -75,7 +77,7 @@ public class AppMazeTwoAgents
 		//		dc.exportMSCA(dir+"twoagents_maze3", comp);
 		//		new JSonConverter().exportMSCA(dir+"twoagents_maze3", comp);
 
-		generateImagesForEachState(dc.importMSCA(dir+"twoagents_maze3.data"));
+		generateImagesForEachState(dc.importMSCA(dir+"twoagents_maze3.data"),false);
 		//	new JSonConverter().exportMSCA(dir+"twoagents_maze3", dc.importMSCA(dir+"twoagents_maze3.data"));
 	}
 
@@ -85,8 +87,12 @@ public class AppMazeTwoAgents
 	 * is a tuple of the position of each agent, and generates for each state of the composition a json encoding image 
 	 * of GraphLogica where in the original starting image the positions of the two agents are emphasised with two 
 	 * different colors (red and green)
+	 * 
+	 * @param json  if true generates json else png
 	 */
-	private static void generateImagesForEachState(Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut) throws Exception {
+	private static void generateImagesForEachState(
+			Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut, 
+			boolean json) throws Exception {
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> maze = dc.importMSCA(dir+"maze3.data");				
 		
 		aut.getStates().parallelStream()
@@ -101,7 +107,9 @@ public class AppMazeTwoAgents
 							:s, BasicState::isInitial, BasicState::isFinalState) //FIXME initial and forbidden states must be sent here
 					.apply(maze));
 			try {
-				jdc.exportMSCA(dir+"twoagentsimages/"+JSonConverter.getstate.apply(aut_s), mazewithagents);
+				AutConverter<?,
+						Automaton<String,Action,State<String>,ModalTransition<String,Action,State<String>,CALabel>>> ac = json?jdc:pdc;
+				ac.exportMSCA(dir+"twoagentsimages/"+JSonConverter.getstate.apply(aut_s), mazewithagents);
 			} catch (Exception e) {
 				RuntimeException re = new RuntimeException();
 				re.addSuppressed(e);
