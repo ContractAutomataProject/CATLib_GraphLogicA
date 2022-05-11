@@ -68,7 +68,7 @@ public class AppVideoComposition
 		System.out.println("composing...");
 		
 		MSCACompositionFunction<String> cf = new MSCACompositionFunction<>(Arrays.asList(maze,driver),
-				new StrongAgreement().negate());
+				t->!t.getLabel().isMatch()); //new StrongAgreement().negate()
 		int bound=0;
 		do {
 			bound++;

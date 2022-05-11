@@ -10,7 +10,7 @@ import io.github.contractautomata.catlib.converters.AutDataConverter;
 import io.github.contractautomata.catlib.operations.RelabelingOperator;
 import io.github.contractautomata.maze.converters.JSonConverter;
 
-public class App2 
+public class AppMazeTwoAgents
 {
 
 	private final static String dir = System.getProperty("user.dir")+"/test/java/io/github/contractautomata/maze/resources/";
