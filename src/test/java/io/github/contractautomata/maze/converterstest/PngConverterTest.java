@@ -51,7 +51,7 @@ public class PngConverterTest {
 	}
 
 	@Test
-	public importJsonExportPng() throws Exception {
+	public void importJsonExportPng() throws Exception {
 	}
 	
 }
