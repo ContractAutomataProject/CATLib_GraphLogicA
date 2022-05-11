@@ -49,5 +49,9 @@ public class PngConverterTest {
 	    File output = new File(dir+"overlap_maze_strategy_noturningback.png");
 	    ImageIO.write(pdc.overlap(plant,pdc.getBufferedImage(bdc.importMSCA(dir+"strategy_noturningback.data"))), "png", output);
 	}
+
+	@Test
+	public importJsonExportPng() throws Exception {
+	}
 	
 }

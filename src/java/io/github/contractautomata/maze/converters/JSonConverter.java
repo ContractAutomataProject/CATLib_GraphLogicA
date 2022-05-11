@@ -129,7 +129,7 @@ public class JSonConverter implements AutConverter<Automaton<String, Action, Sta
 				.forEach(ca->{
 					JSONObject node = new JSONObject();
 					node.put("id", getstate.apply(ca));
-					node.append("attr", getattr.apply(ca));
+					node.append("atoms", getattr.apply(ca));
 					nodes.put(node);
 				});
 

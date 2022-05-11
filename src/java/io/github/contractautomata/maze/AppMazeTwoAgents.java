@@ -13,7 +13,7 @@ import io.github.contractautomata.maze.converters.JSonConverter;
 public class App2 
 {
 
-	private final static String dir = System.getProperty("user.dir")+"/src/test/java/io/github/davidebasile/resources/";
+	private final static String dir = System.getProperty("user.dir")+"/test/java/io/github/contractautomata/maze/resources/";
 
 	//private final static PngConverter pdc = new PngConverter();
 	private final static AutDataConverter<CALabel> dc = new AutDataConverter<>(CALabel::new);
