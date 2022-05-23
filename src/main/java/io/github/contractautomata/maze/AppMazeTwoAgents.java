@@ -36,6 +36,11 @@ public class AppMazeTwoAgents
 
 	public static void main( String[] args ) throws Exception
 	{
+//		uncontrollable: green, door
+//
+//		initial1 forbidden1
+//		initial1 forbidden2
+//		initial2 forbidden1 - expected empty
 
 		System.out.println( "Maze Demo!" );
 
@@ -49,18 +54,18 @@ public class AppMazeTwoAgents
 
 		//compute the composition of two agents and a driver and export it
 		System.out.println("importing...");
-		
+
 		final State<String> stateDriver = new State<>(List.of(new BasicState<>("Driver",true,true)));
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> driver = 
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> driver =
 				new Automaton<>(Stream.of("goup","godown","goleft","goright")
-				.map(s->new CALabel(1,0,new OfferAction(s)))
-				.map(act->new ModalTransition<>(stateDriver,act,stateDriver,Modality.PERMITTED))
-				.collect(Collectors.toSet()));
+						.map(s->new CALabel(1,0,new OfferAction(s)))
+						.map(act->new ModalTransition<>(stateDriver,act,stateDriver,Modality.PERMITTED))
+						.collect(Collectors.toSet()));
 
 
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> door = 
-				new Automaton<>(Map.of(new State<>(List.of(new BasicState<>("Close",true,false))), 
-						new State<>(List.of(new BasicState<>("Open",false,true))))
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> door =
+				new Automaton<>(Map.of(new State<>(List.of(new BasicState<>("Close",true,false))),
+								new State<>(List.of(new BasicState<>("Open",false,true))))
 						.entrySet().stream()
 						.flatMap(e->Stream.of(new ModalTransition<>(e.getKey(), new CALabel(1,0,new OfferAction("open")), e.getValue(), Modality.PERMITTED),
 								new ModalTransition<>(e.getValue(), new CALabel(1,0,new OfferAction("close")), e.getKey(), Modality.PERMITTED)))
@@ -69,20 +74,20 @@ public class AppMazeTwoAgents
 
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>  maze = pdc.importMSCA(dir+"maze3.png");
 
-		Function<Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>, 
-					Set<ModalTransition<String,Action,State<String>,CALabel>>> relabel = aut ->
+		Function<Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>,
+				Set<ModalTransition<String,Action,State<String>,CALabel>>> relabel = aut ->
 				new RelabelingOperator<String,CALabel>(CALabel::new,s->s,s->s.getState().split("_")[0].equals("(1; 1; 0)"),s->true).apply(aut);
-				
+
 		Set<ModalTransition<String,Action,State<String>,CALabel>> maze_tr = relabel.apply(maze);
 		Set<ModalTransition<String,Action,State<String>,CALabel>> maze2_tr = relabel.apply(maze);
-		
+
 		//		dc.exportMSCA(dir+"maze2.data",maze);
 		//		MSCA maze = dc.importMSCA(dir+"maze2.aut.data");
 
 
 		Stream.of(maze_tr, maze2_tr)
-		.forEach(set->{//addInitialState(set); 
-						setForbiddenStates(set);});
+				.forEach(set->{//addInitialState(set);
+					setForbiddenStates(set);});
 
 		System.out.println("composing...");
 
@@ -102,14 +107,14 @@ public class AppMazeTwoAgents
 	private static void addInitialState(Set<ModalTransition<String,Action,State<String>,CALabel>> maze_tr) {
 		//set initial  state to a state  that is not forbidden
 		State<String> init = new State<>(List.of(new BasicState<>("Init",true,false)));
-		maze_tr.add(new ModalTransition<>(init, new CALabel(1,0,new OfferAction("start")), 
+		maze_tr.add(new ModalTransition<>(init, new CALabel(1,0,new OfferAction("start")),
 				maze_tr.parallelStream()
-				.flatMap(t->Stream.of(t.getSource(),t.getTarget()))
-				.filter(s->!s.getState().get(0).getState().contains("#000000"))
-				.findAny().orElseThrow(IllegalArgumentException::new),
+						.flatMap(t->Stream.of(t.getSource(),t.getTarget()))
+						.filter(s->!s.getState().get(0).getState().contains("#000000"))
+						.findAny().orElseThrow(IllegalArgumentException::new),
 				Modality.PERMITTED));
 	}
-	
+
 
 	private static void setForbiddenStates(Set<ModalTransition<String,Action,State<String>,CALabel>> maze_tr) {
 		//set forbidden states
@@ -125,40 +130,40 @@ public class AppMazeTwoAgents
 	 * is a tuple of the position of each agent, and generates for each state of the composition a json encoding image 
 	 * of GraphLogica or a png where in the original starting image the positions of the two agents are emphasised with two 
 	 * different colors (red and green)
-	 * 
+	 *
 	 * @param json  if true generates json else png
 	 */
 	private static void generateImagesForEachState(
-			Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut, 
+			Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut,
 			boolean json) throws Exception {
-		
+
 		System.out.println("Generating images...");
-		
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> maze = pdc.importMSCA(dir+"maze3.png");				
+
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> maze = pdc.importMSCA(dir+"maze3.png");
 
 		aut.getStates().parallelStream()
-		.forEach(aut_s->{
-			final String s1 = aut_s.getState().get(0).getState().split("_")[0];
-			final String s2 = aut_s.getState().get(1).getState().split("_")[0];
-			final boolean gateClosed = aut_s.getState().get(3).getState().equals("Close");
+				.forEach(aut_s->{
+					final String s1 = aut_s.getState().get(0).getState().split("_")[0];
+					final String s2 = aut_s.getState().get(1).getState().split("_")[0];
+					final boolean gateClosed = aut_s.getState().get(3).getState().equals("Close");
 
-			Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>
-			mazewithagents = new Automaton<>(new RelabelingOperator<String,CALabel>(CALabel::new, s->
-			s.split("_")[0].equals(s1)?s.split("_")[0]+"_#FF0000"
-					:s.split("_")[0].equals(s2)?s.split("_")[0]+"_#00FF00"
-							:gateClosed&&s.split("_")[0].equals(gateCoordinates)?gateCoordinates+"_#0000FF"
-									:s, BasicState::isInitial, BasicState::isFinalState) 
-					.apply(maze));
-			try {
-				AutConverter<?,
-						Automaton<String,Action,State<String>,ModalTransition<String,Action,State<String>,CALabel>>> ac = json?jdc:pdc;
-				ac.exportMSCA(dir+"twoagentsimages/"+JSonConverter.getstate.apply(aut_s), mazewithagents);
-			} catch (Exception e) {
-				RuntimeException re = new RuntimeException();
-				re.addSuppressed(e);
-				throw re;
-			}		
-		});
+					Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>
+							mazewithagents = new Automaton<>(new RelabelingOperator<String,CALabel>(CALabel::new, s->
+							gateClosed&&s.split("_")[0].equals(gateCoordinates)?gateCoordinates+"_#0000FF": //if the gate is closed it must be draw first
+									s.split("_")[0].equals(s1)?s.split("_")[0]+"_#FF0000"
+											:s.split("_")[0].equals(s2)?s.split("_")[0]+"_#00FF00"
+												:s, BasicState::isInitial, BasicState::isFinalState)
+							.apply(maze));
+					try {
+						AutConverter<?,
+								Automaton<String,Action,State<String>,ModalTransition<String,Action,State<String>,CALabel>>> ac = json?jdc:pdc;
+						ac.exportMSCA(dir+"twoagentsimages/"+JSonConverter.getstate.apply(aut_s), mazewithagents);
+					} catch (Exception e) {
+						RuntimeException re = new RuntimeException();
+						re.addSuppressed(e);
+						throw re;
+					}
+				});
 	}
 }
 
