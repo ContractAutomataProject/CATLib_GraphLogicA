@@ -56,8 +56,6 @@ public class AppMazeTwoAgents
 				.map(s->new CALabel(1,0,new OfferAction(s)))
 				.map(act->new ModalTransition<>(stateDriver,act,stateDriver,Modality.PERMITTED))
 				.collect(Collectors.toSet()));
-				
-				//	dc.importMSCA(dir+"driver.data");
 
 
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> door = 
