@@ -7,7 +7,6 @@ import re
 import os
 import pandas as pd
 from pathlib import Path
-from niwidgets import NiftiWidget
 import graphviz
 
 voxlogica_bin = "./VoxLogicA/binaries/VoxLogicA_1.0-experimental_linux-x64/VoxLogicA"

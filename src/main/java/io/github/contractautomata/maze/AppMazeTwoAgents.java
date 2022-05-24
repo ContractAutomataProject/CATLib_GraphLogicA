@@ -49,19 +49,21 @@ public class AppMazeTwoAgents
 
 		System.out.println( "Maze Demo!" );
 
+//		either compute and save the composition, or load it
 //		computesCompositionAndSaveIt();
-
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> comp =
-				dc.importMSCA(dir+"twoagents_maze3.data");
+//		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> comp =
+//				dc.importMSCA(dir+"twoagents_maze3.data");
 
 //		generateImagesForEachState(dc.importMSCA(dir+"twoagents_maze3.data"),false);
 
+//		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> marked =
+//				readVoxLogicaOutputAndMarkStates(comp,"initial1","forbidden1");
+//		System.out.println("Exporting marked composition");
+//		dc.exportMSCA(dir + "twoagents_maze3_marked", marked);
+
+		System.out.println("Importing marked composition");
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> marked =
-				readVoxLogicaOutputAndMarkStates(comp,"initial1","forbidden1");
-
-		System.out.println("Exporting marked composition");
-
-		dc.exportMSCA(dir + "twoagents_maze3_marked", marked);
+				dc.importMSCA(dir + "twoagents_maze3_marked.data");
 
 		System.out.println("...computing the synthesis... ");
 		MpcSynthesisOperator<String> mso = new MpcSynthesisOperator<>(l->true);
@@ -219,14 +221,16 @@ public class AppMazeTwoAgents
 		System.out.println("State Marking ... ");
 
 		//mark initial, final and forbidden states
-		final State<String> init = new State<>(List.of(new BasicState<>("Init",true,false)));
-		final State<String> finalstate = new State<>(List.of(new BasicState<>("Final",false,true)));
+		BasicState<String> bsi = new BasicState<>("Init",true,false);
+		BasicState<String> bsf = new BasicState<>("Final",false,true);
+		final State<String> init = new State<>(List.of(bsi,bsi,bsi,bsi));
+		final State<String> finalstate = new State<>(List.of(bsf,bsf,bsf,bsf));
 
 		Function<State<String>, ModalTransition<String, Action, State<String>, CALabel>> f_forbidden =
-				(State<String> s)->new ModalTransition<>(s,new CALabel(1,0,new RequestAction("forbidden")),s,Modality.URGENT);
+				(State<String> s)->new ModalTransition<>(s,new CALabel(s.getRank(),0,new RequestAction("forbidden")),s,Modality.URGENT);
 
-		setr.addAll(Map.of(initialstate,(State<String> s)-> new ModalTransition<>(init,new CALabel(1,0,new OfferAction("start")),s,Modality.PERMITTED),
-						finalstates,(State<String> s)->new ModalTransition<>(s, new CALabel(1,0,new OfferAction("stop")),	finalstate,Modality.PERMITTED),
+		setr.addAll(Map.of(initialstate,(State<String> s)-> new ModalTransition<>(init,new CALabel(s.getRank(),0,new OfferAction("start")),s,Modality.PERMITTED),
+						finalstates,(State<String> s)->new ModalTransition<>(s, new CALabel(s.getRank(),0,new OfferAction("stop")),	finalstate,Modality.PERMITTED),
 						forbiddenstates,f_forbidden)
 						.entrySet().parallelStream()
 						.flatMap(e->setr.parallelStream()
@@ -243,7 +247,7 @@ public class AppMazeTwoAgents
 				.mapToObj(obj::getJSONObject)
 			//	.peek(System.out::println)
 				.filter(pred)
-				.map(o->o.getString("filename"))
+				.map(o->o.getString("filename").split(".png")[0])
 				.collect(Collectors.toSet());
 	}
 }
