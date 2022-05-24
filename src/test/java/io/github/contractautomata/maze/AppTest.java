@@ -31,8 +31,9 @@ public class AppTest
     /**
      * Rigourous Test :-)
      */
-    public void testApp()
-    {
+    @org.junit.Test
+    public void testApp() throws Exception {
+        AppMazeTwoAgents.main(null);
         assertTrue( true );
     }
 }
