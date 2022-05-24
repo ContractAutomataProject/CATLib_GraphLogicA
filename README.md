@@ -13,5 +13,5 @@ All frames are stored in the folder src/test/ ... /resources/video.
 
 ## Miscellanea
 
-The JSONConverter for importing graphs of <a href="https://github.com/vincenzoml/topochecker">topochecker</a> encoding bitmap images has been moved into this repository.
+The JSONConverter for importing graphs of <a href="https://github.com/vincenzoml/VoxLogicA">VoxLogicA</a> encoding bitmap images has been moved into this repository.
 A PngConverter is also available for directly importing png images as automata, by-passing the JSon representation.
