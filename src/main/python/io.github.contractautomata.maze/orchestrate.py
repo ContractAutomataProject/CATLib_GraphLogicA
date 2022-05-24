@@ -11,9 +11,16 @@ import json
 import os.path
 from joblib import Parallel, delayed
 import multiprocessing
+import subprocess 
 
-baseimage = './src/test/java/io/github/contractautomata/maze/resources/maze3.png'
-datadir = './src/test/java/io/github/contractautomata/maze/resources/twoagentsimages/png'
+try:
+    basedir = subprocess.check_output(['git','rev-parse','--show-toplevel'],encoding='utf-8').strip()
+except:
+    basedir="."
+#%%
+
+baseimage = f'{basedir}/src/test/java/io/github/contractautomata/maze/resources/maze3.png'
+datadir = f'{basedir}/src/test/java/io/github/contractautomata/maze/resources/twoagentsimages/png'
 images = [fname for fname in os.listdir(datadir) if fname.endswith(".png")]
 tmpdir = "./tmp"
 cache = "./cache.json"
