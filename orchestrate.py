@@ -110,6 +110,7 @@ let final = exists(mrRed & exit) .&. exists(mrGreen & exit)
 {vlprint("initial2")}
 {vlprint("forbidden1")}
 {vlprint("forbidden2")}
+{vlprint("final")}
 {vlprint("canExit(mrGreen)")}
 {vlprint("wrong")}
 {vlprint("sameRoom")}
