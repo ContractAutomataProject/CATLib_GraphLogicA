@@ -25,7 +25,7 @@ images = [fname for fname in os.listdir(datadir) if fname.endswith(".png")]
 tmpdir = "./tmp"
 cache = "./cache.json"
 # Result computation and auxiliary function "view"
-def compute(specification,start=0,end=len(images)-1):
+def compute(specification,start=0,end=len(images)-1,images=images):
     num_cores = 1 #multiprocessing.cpu_count()
 
     def processInput(image):
@@ -143,5 +143,21 @@ else:
     items = compute(specification)
     with open(cache, 'w') as f:
         json.dump(items, f)    
+
+# %%
+
+wrong = [ x["filename"] for x in items if len(x["results"].keys()) != 15 ]
+# %%
+rescued = compute(specification,images=wrong)
+
+# %%
+
+correct = [x for x in items if len(x["results"].keys()) == 15 ]
+# %%
+
+final = correct + rescued
+
+with open("cache.json", 'w') as f:
+    json.dump(final, f)    
 
 # %%
