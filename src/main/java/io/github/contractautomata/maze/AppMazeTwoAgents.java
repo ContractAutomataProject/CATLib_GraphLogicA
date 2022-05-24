@@ -15,6 +15,7 @@ import io.github.contractautomata.catlib.converters.AutDataConverter;
 import io.github.contractautomata.catlib.operations.MSCACompositionFunction;
 import io.github.contractautomata.catlib.operations.MpcSynthesisOperator;
 import io.github.contractautomata.catlib.operations.RelabelingOperator;
+import io.github.contractautomata.catlib.requirements.Agreement;
 import io.github.contractautomata.maze.converters.JSonConverter;
 import io.github.contractautomata.maze.converters.PngConverter;
 import org.json.JSONArray;
@@ -66,7 +67,7 @@ public class AppMazeTwoAgents
 				dc.importMSCA(dir + "twoagents_maze3_marked.data");
 
 		System.out.println("...computing the synthesis... ");
-		MpcSynthesisOperator<String> mso = new MpcSynthesisOperator<>(l->true);
+		MpcSynthesisOperator<String> mso = new MpcSynthesisOperator<>(new Agreement());
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy =
 				mso.apply(marked);
 
