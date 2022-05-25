@@ -1,4 +1,4 @@
-package io.github.contractautomata.maze;
+package io.github.contractautomata.maze.twoagentsproblem;
 
 import io.github.contractautomata.catlib.automaton.Automaton;
 import io.github.contractautomata.catlib.automaton.label.CALabel;
@@ -50,26 +50,31 @@ public class AppMazeTwoAgents
 //		initial2 forbidden1 - expected empty
 
 		System.out.println( "Maze Demo!" );
+		boolean computeComposition = false;
+		boolean computeMarkingOfComposition = false;
 
-//		either compute and save the composition, or load it
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> comp = computesCompositionAndSaveIt();
-//		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> comp =
-//				dc.importMSCA(dir+"twoagents_maze3.data");
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> comp;
+		if (computeComposition)
+			comp = computesCompositionAndSaveIt();
+		else
+			comp = dc.importMSCA(dir+"twoagents_maze3.data");
 
-		generateImagesForEachState(dc.importMSCA(dir+"twoagents_maze3.data"),false);
+		generateImagesForEachState(comp,false);
 
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> marked =
-				readVoxLogicaOutputAndMarkStates(comp,"initial1","forbidden1");
-		System.out.println("Exporting marked composition");
-		dc.exportMSCA(dir + "twoagents_maze3_marked", marked);
-//		System.out.println("Importing marked composition");
-//		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> marked =
-//				dc.importMSCA(dir + "twoagents_maze3_marked.data");
-//
+		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> marked;
+		if (computeMarkingOfComposition) {
+			marked = readVoxLogicaOutputAndMarkStates(comp, "initial1", "forbidden1"); //computing
+			System.out.println("Exporting marked composition");
+			dc.exportMSCA(dir + "twoagents_maze3_marked", marked);
+		}
+		else {
+			System.out.println("Importing marked composition");
+			marked = dc.importMSCA(dir + "twoagents_maze3_marked.data"); //importing
+		}
+
 		System.out.println("...computing the synthesis... ");
-		MpcSynthesisOperator<String> mso = new MpcSynthesisOperator<>(new Agreement());
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy =
-				mso.apply(marked);
+				new MpcSynthesisOperator<String>(new Agreement()).apply(marked);
 
 		dc.exportMSCA(dir + "strategy_twoagents_maze3", strategy);
 	}
