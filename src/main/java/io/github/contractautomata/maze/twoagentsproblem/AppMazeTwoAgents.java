@@ -50,24 +50,27 @@ public class AppMazeTwoAgents
 //		initial2 forbidden1 - expected empty
 
 		System.out.println( "Maze Demo!" );
+
 		boolean computeComposition = false;
-		boolean computeMarkingOfComposition = false;
-
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> comp;
-		if (computeComposition)
-			comp = computesCompositionAndSaveIt();
-		else
-			comp = dc.importMSCA(dir+"twoagents_maze3.data");
-
-		generateImagesForEachState(comp,false);
+		boolean computeMarkingOfComposition = true;
 
 		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> marked;
-		if (computeMarkingOfComposition) {
+		if (computeMarkingOfComposition)
+		{
+			Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> comp;
+			if (computeComposition)
+				comp = dc.importMSCA(dir+"twoagents_maze3.data");
+			else
+				comp = computesCompositionAndSaveIt();
+
+			//generateImagesForEachState(comp,false);
+
 			marked = readVoxLogicaOutputAndMarkStates(comp, "initial1", "forbidden1"); //computing
 			System.out.println("Exporting marked composition");
 			dc.exportMSCA(dir + "twoagents_maze3_marked", marked);
 		}
-		else {
+		else
+		{
 			System.out.println("Importing marked composition");
 			marked = dc.importMSCA(dir + "twoagents_maze3_marked.data"); //importing
 		}
@@ -167,10 +170,10 @@ public class AppMazeTwoAgents
 	}
 
 	/**
-	 * this private method takes the composition automaton of two agents, where each state of the composition 
-	 * is a tuple of the position of each agent, and generates for each state of the composition a json encoding image 
+	 * this private method takes the composition automaton, where each state of the composition
+	 * is a tuple of the position of each agent and the door state, and generates for each state of the composition a json encoding image
 	 * of GraphLogica or a png where in the original starting image the positions of the two agents are emphasised with two 
-	 * different colors (red and green)
+	 * different colors (red and green) whilst the door is blue
 	 *
 	 * @param json  if true generates json else png
 	 */
@@ -210,7 +213,6 @@ public class AppMazeTwoAgents
 
 	private static Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> readVoxLogicaOutputAndMarkStates(Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut,
 																																				   String initialkey, String forbiddenkey) throws IOException {
-
 		System.out.println("reading voxlogica computed file");
 		//parse the voxlogica json output and extract the information about initial, final and forbidden states
 		String content = Files.readAllLines(Paths.get(dir+"voxlogicaoutput/experiment2.json"))
@@ -238,12 +240,12 @@ public class AppMazeTwoAgents
 		RelabelingOperator<String,CALabel> ro = new RelabelingOperator<>(CALabel::new,x->x,x->false,x->false);
 
 
-		System.out.println("Reset initial and final states, and turn Mr Green to uncontrollable");
+		System.out.println("Reset initial and final states, and selected agents to uncontrollable");
 		//uncontrollable: Mr Green
 		//turn the moves of the second principal (mrGreen) to uncontrollable
 		Set<ModalTransition<String, Action, State<String>, CALabel>> setr = ro.apply(aut).parallelStream()
 				.map(t->new ModalTransition<>(t.getSource(),t.getLabel(),t.getTarget(),
-						(t.getLabel().getContent().get(1) instanceof IdleAction)?
+						(t.getLabel().getContent().get(3) instanceof IdleAction)?
 								Modality.PERMITTED: ModalTransition.Modality.URGENT))
 				.collect(Collectors.toSet());
 

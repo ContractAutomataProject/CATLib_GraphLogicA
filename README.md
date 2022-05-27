@@ -1,4 +1,4 @@
-# CATLib for Spatial Problems
+ATLib for Spatial Problems
 
 This repository groups experiments being performed about applying CATLib to spatial problems, e.g., synthesising a strategy 
 enforcing spatial properties on a topological graph.
