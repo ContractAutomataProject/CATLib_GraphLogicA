@@ -154,7 +154,7 @@ public class AppMazeTwoAgents
 		}
 	}
 
-	private static Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> computesCompositionAndSaveIt(boolean legal) throws IOException {
+	private static Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> computesCompositionAndSaveIt(boolean legal) throws IOException, ParserConfigurationException, SAXException {
 
 		//compute the composition of two agents and a driver and export it
 		System.out.println("create driver and door...");
@@ -177,7 +177,7 @@ public class AppMazeTwoAgents
 
 		System.out.println("importing the maze image");
 
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>  maze = pdc.importMSCA(dir+"maze3.png");
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>  maze = loadFile("maze3.png",true);//pdc.importMSCA(dir+"maze3.png");
 
 		BiFunction<String, Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>,
 				Set<ModalTransition<String,Action,State<String>,CALabel>>> relabel = (l,aut) ->

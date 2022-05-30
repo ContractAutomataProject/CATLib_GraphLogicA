@@ -83,7 +83,7 @@ public class JSonConverter implements AutConverter<Automaton<String, Action, Sta
 		String regex = "\\(([0-9]*);\\s([0-9]*);\\s([0-9]*)\\)(.)*";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(source.getState().get(0).getState());
-		System.out.println(source);
+		//System.out.println(source);
 		matcher.find();
 
 		int x_source = Integer.parseInt(matcher.group(1));

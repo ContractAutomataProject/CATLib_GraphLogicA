@@ -39,6 +39,9 @@ public class PngConverterTest {
 	public void exportTest() throws Exception {
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>, CALabel>> aut = bdc.importMSCA(dir+"maze.data");
 		pdc.exportMSCA(dir+"maze_export.png",aut);
+		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> aut2 =
+				pdc.importMSCA(dir+"maze_export.png");
+		assertTrue(JsonConverterTest.autEquals(aut, aut2));
 
 	}
 	
@@ -50,10 +53,10 @@ public class PngConverterTest {
 	    ImageIO.write(pdc.overlap(plant,pdc.getBufferedImage(bdc.importMSCA(dir+"strategy_noturningback.data"))), "png", output);
 	}
 
-	@Test
-	public void importJsonExportPng() throws Exception {
-		pdc.exportMSCA(dir + "twoagentsimages/(0, 1, 0),(1, 0, 0),0.png", 
-				jc.importMSCA(dir + "twoagentsimages/(0, 1, 0),(1, 0, 0),0.json"));
-	}
+//	@Test
+//	public void importJsonExportPng() throws Exception {
+//		pdc.exportMSCA(dir + "twoagentsimages/(0, 1, 0),(1, 0, 0),0.png",
+//				jc.importMSCA(dir + "twoagentsimages/(0, 1, 0),(1, 0, 0),0.json"));
+//	}
 	
 }

@@ -24,16 +24,20 @@ public class JsonConverterTest {
 	@Test
 	public void importTest() throws Exception {
 		JSonConverter jc = new JSonConverter();
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = jc.importMSCA(dir+"testgraph.json");
-	    bdc.exportMSCA(dir+"testgraph", aut);
-	    assertEquals(autEquals(aut, aut),true);
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = jc.importMSCA(dir+"maze_nosolution.json");
+	    bdc.exportMSCA(dir+"maze_nosolution", aut);
+
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut2 = bdc.importMSCA(dir+"maze_nosolution.data");
+	    assertEquals(autEquals(aut, aut2),true);
 	}
 	
 	@Test
 	public void exportTest() throws Exception {
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = bdc.importMSCA(dir+"strategy.data");
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = bdc.importMSCA(dir+"maze_nosolution.data");
 		JSonConverter jc = new JSonConverter();
-		jc.exportMSCA(dir+"strategy.json",aut);
+		jc.exportMSCA(dir+"maze_nosolution.json",aut);
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut2 = jc.importMSCA(dir+"maze_nosolution.json");
+		assertEquals(autEquals(aut, aut2),true);
 	}
 
 	public static boolean autEquals(Automaton<?,?,?,?> aut, Automaton<?,?,?,?>  test) {
