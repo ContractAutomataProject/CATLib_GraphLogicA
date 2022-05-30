@@ -177,7 +177,7 @@ public class AppMazeTwoAgents
 
 		System.out.println("importing the maze image");
 
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>  maze = loadFile("maze3.png",true);//pdc.importMSCA(dir+"maze3.png");
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>  maze = loadFile("io/github/contractautomata/maze/twoagentsproblem/resources/maze3.png",true);//pdc.importMSCA(dir+"maze3.png");
 
 		BiFunction<String, Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>,
 				Set<ModalTransition<String,Action,State<String>,CALabel>>> relabel = (l,aut) ->
@@ -245,7 +245,7 @@ public class AppMazeTwoAgents
 
 		System.out.println("Generating images...");
 
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> maze = loadFile("maze3.png",true);// pdc.importMSCA(dir+"maze3.png");
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> maze = loadFile("io/github/contractautomata/maze/twoagentsproblem/resources/maze3.png",true);// pdc.importMSCA(dir+"maze3.png");
 
 		aut.getStates().parallelStream()
 				.forEach(aut_s->{

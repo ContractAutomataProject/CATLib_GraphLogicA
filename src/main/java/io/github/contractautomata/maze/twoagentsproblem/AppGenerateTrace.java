@@ -4,16 +4,13 @@ import io.github.contractautomata.catlib.automaton.Automaton;
 import io.github.contractautomata.catlib.automaton.label.CALabel;
 import io.github.contractautomata.catlib.automaton.label.Label;
 import io.github.contractautomata.catlib.automaton.label.action.Action;
-import io.github.contractautomata.catlib.automaton.label.action.OfferAction;
 import io.github.contractautomata.catlib.automaton.state.BasicState;
 import io.github.contractautomata.catlib.automaton.state.State;
 import io.github.contractautomata.catlib.automaton.transition.ModalTransition;
 import io.github.contractautomata.catlib.converters.AutDataConverter;
 import io.github.contractautomata.catlib.operations.*;
-import io.github.contractautomata.catlib.requirements.Agreement;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -36,7 +33,7 @@ public class AppGenerateTrace {
     }
 
     private static void printCut( Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy) throws IOException {
-        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = dc.importMSCA(dir + "twoagents_maze3_marked.data");
+        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = dc.importMSCA(dir + "io/github/contractautomata/maze/twoagentsproblem/resources/twoagents_maze3_marked.data");
 
         //all transitions in aut with source state in strategy and target state not in strategy
 
@@ -55,7 +52,7 @@ public class AppGenerateTrace {
     }
 
     private static void printStrategyInfo() throws IOException {
-        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy = dc.importMSCA(dir+"strategy_twoagents_maze3.data");
+        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy = dc.importMSCA(dir+ "io/github/contractautomata/maze/twoagentsproblem/resources/strategy_twoagents_maze3.data");
         System.out.println("There are "+strategy.getTransition().size() + " transitions and "+strategy.getStates().size()+" states.");
     }
 

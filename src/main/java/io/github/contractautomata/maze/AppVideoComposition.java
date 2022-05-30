@@ -8,9 +8,7 @@ import io.github.contractautomata.catlib.automaton.state.State;
 import io.github.contractautomata.catlib.automaton.transition.ModalTransition;
 import io.github.contractautomata.catlib.converters.AutDataConverter;
 import io.github.contractautomata.catlib.operations.MSCACompositionFunction;
-import io.github.contractautomata.catlib.operations.MpcSynthesisOperator;
 import io.github.contractautomata.catlib.operations.RelabelingOperator;
-import io.github.contractautomata.catlib.requirements.StrongAgreement;
 import io.github.contractautomata.maze.converters.PngConverter;
 
 import javax.imageio.ImageIO;
@@ -51,7 +49,7 @@ public class AppVideoComposition
 		//dc.exportMSCA(dir+"maze2.data",maze);
 		//MSCA maze = dc.importMSCA(dir+"maze2.aut.data");
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> driver =
-				dc.importMSCA(dir+"driver.data");
+				dc.importMSCA(dir+ "io/github/contractautomata/maze/twoagentsproblem/resources/driver.data");
 
 		System.out.println("resetting states...");
 
