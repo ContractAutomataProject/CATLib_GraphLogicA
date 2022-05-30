@@ -26,11 +26,13 @@ public class AppGenerateTrace {
     private final static AutDataConverter<CALabel> dc = new AutDataConverter<>(CALabel::new);
 
     public static void main(String[] args) throws IOException {
-         Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy = dc.importMSCA(dir + "strategy_twoagents_maze3.data");
-        // printCut(strategy);
+//         Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy = dc.importMSCA(dir + "strategy_twoagents_maze3.data");
+//        // printCut(strategy);
+//
+//        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> shortest = shortestPath(strategy);
+//        dc.exportMSCA(dir + "strategyShortest", shortest );
 
-        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> shortest = shortestPath(strategy);
-        new AutDataConverter<CALabel>(CALabel::new).exportMSCA(dir + "strategyShortest", shortest );
+        printStrategyInfo();
     }
 
     private static void printCut( Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy) throws IOException {
@@ -50,6 +52,11 @@ public class AppGenerateTrace {
         System.out.println(liables.stream()
                 .map(ModalTransition::toString).collect(Collectors.joining("\n")));
 
+    }
+
+    private static void printStrategyInfo() throws IOException {
+        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy = dc.importMSCA(dir+"strategy_twoagents_maze3.data");
+        System.out.println("There are "+strategy.getTransition().size() + " transitions and "+strategy.getStates().size()+" states.");
     }
 
     private static Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> shortestPath(Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy){
