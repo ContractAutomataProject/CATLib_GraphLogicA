@@ -29,11 +29,12 @@ public class AppGenerateTrace {
 //        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> shortest = shortestPath(strategy);
 //        dc.exportMSCA(dir + "strategyShortest", shortest );
 
+
         printStrategyInfo();
     }
 
     private static void printCut( Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy) throws IOException {
-        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = dc.importMSCA(dir + "io/github/contractautomata/maze/twoagentsproblem/resources/twoagents_maze3_marked.data");
+       Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = dc.importMSCA(dir + "io/github/contractautomata/maze/twoagentsproblem/resources/twoagents_maze3_marked.data");
 
         //all transitions in aut with source state in strategy and target state not in strategy
 

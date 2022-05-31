@@ -24,9 +24,8 @@ import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -56,18 +55,22 @@ public class AppMazeTwoAgents
 //		initial1 forbidden2
 //		initial2 forbidden1 - expected empty
 
-		String message = "Usage : java -jar -Xss1000M AppMazeTwoAgents.jar [options] \n" +
+		String message = "Usage : java -jar -Xss1000M maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar [options] \n" +
 				"where options are :\n" +
-				"-composition   (compute and store the whole composition, generate an image for each state of the composition) \n" +
+				"-composition   (compute and store the whole composition) \n" +
+				"-generateimages (generate an image for each state of the composition) \n" +
 				"-legalcomposition   (compute and store the composition with only legal moves) \n" +
-				"-synthesis [1|2] (mark the composition with the properties for either experiment 1 or 2, synthesise and store the strategy) \n";
+				"-markcomposition [1|2] (compute the composition marked with properties from voxlogica logs for either experiment 1 or 2) \n" +
+				"-synthesis [1|2] (synthesise and store the strategy  for either experiment 1 or 2) \n";
 
 		boolean computeComposition=false;
 		boolean computeMarkingOfComposition=false;
 		boolean legal=false;
 		boolean firstexperiment=false;
 		boolean secondexperiment=false;
-
+		boolean generateImages=false;
+		boolean synthesis=false;
+		String exp="";
 		Instant start, stop;
 		long elapsedTime;
 
@@ -82,63 +85,78 @@ public class AppMazeTwoAgents
 			if(args[i].equals("-composition")) {
 				computeComposition=true;
 				legal=false;
+				break;
+			}
+			else if(args[i].equals("-generateimages")) {
+				generateImages=true;
+				break;
 			}
 			else if(args[i].equals("-legalcomposition")) {
 				computeComposition=true;
 				legal=true;
+				break;
+			}
+			else if(args[i].equals("-markcomposition")) {
+				computeMarkingOfComposition=true;
+				exp = args[++i];
+				break;
 			}
 			else if(args[i].equals("-synthesis")) {
-				computeMarkingOfComposition=true;
-				computeComposition=false;
-				String exp = args[++i];
-				firstexperiment=(exp=="1");
-				secondexperiment=(exp=="2");
-				if (!firstexperiment&&!secondexperiment){
-					System.out.println(message);
-					return;
-				}
+				synthesis=true;
+				exp = args[++i];
+				break;
+			}
+		}
+		if (computeMarkingOfComposition || synthesis) {
+			firstexperiment = (exp.equals("1"));
+			secondexperiment = (exp.equals("2"));
+			if (!firstexperiment && !secondexperiment) {
+				System.out.println(message);
+				return;
 			}
 		}
 
 		if (computeComposition) {
-
 			start = Instant.now();
-			System.out.println("Starting..."+start);
-			Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> comp = computesCompositionAndSaveIt(legal);
-
-
+			System.out.println("Starting..." + start);
+			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> comp = computesCompositionAndSaveIt(legal);
 			stop = Instant.now();
 			elapsedTime = Duration.between(start, stop).toMillis();
-			System.out.println("Elapsed time "+elapsedTime);
+			System.out.println("Elapsed time " + elapsedTime + " ms");
 
-			if (!legal){
-				start = Instant.now();
-				System.out.println("Start generating images..."+start);
-				generateImagesForEachState(comp,false);
-				stop = Instant.now();
-				elapsedTime = Duration.between(start, stop).toMillis();
-				System.out.println("Elapsed time "+elapsedTime);
-			}
+			System.out.println("Exporting the composition");
+			dc.exportMSCA("twoagents_maze" + (legal ? "_legal.data" : ".data"), comp);
 		}
-
-		if (computeMarkingOfComposition)
-		{
-			System.out.println("Importing legal composition ");
-			Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> comp =  loadFile("twoagents_maze_legal.data",false);// dc.importMSCA(dir+"twoagents_maze3.data");
-
+		else if (generateImages){
+			System.out.println("Importing composition");
+			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> comp = loadFile("twoagents_maze.data",false);
 
 			start = Instant.now();
-			System.out.println("Start marking automaton with voxlogica output at "+start);
+			System.out.println("Start generating images at "+start);
+			generateImagesForEachState(comp,false);
+			stop = Instant.now();
+			elapsedTime = Duration.between(start, stop).toMillis();
+			System.out.println("Elapsed time "+elapsedTime+ " ms");
+		}
+		else if (computeMarkingOfComposition) {
+			System.out.println("Importing legal composition ");
+			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> comp = loadFile("twoagents_maze_legal.data", false);// dc.importMSCA(dir+"twoagents_maze3.data");
+
+			start = Instant.now();
+			System.out.println("Start marking automaton with voxlogica output at " + start);
 			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> marked = readVoxLogicaOutputAndMarkStates(comp, "initial1",
-					firstexperiment?"forbidden1":"forbidden2", firstexperiment); //computing
+					firstexperiment ? "forbidden2" : "forbidden1", firstexperiment); //computing
 
 			stop = Instant.now();
 			elapsedTime = Duration.between(start, stop).toMillis();
-			System.out.println("Elapsed time "+elapsedTime);
+			System.out.println("Elapsed time " + elapsedTime + " ms");
 
 			System.out.println("Exporting marked composition");
-			dc.exportMSCA(dir + "twoagents_maze_marked_"+(firstexperiment?"firstexp":"secondexp"), marked);
-
+			dc.exportMSCA("twoagents_maze_marked_" + (firstexperiment ? "firstexp" : "secondexp"), marked);
+		}
+		else if (synthesis){
+			System.out.println("Importing marked composition ");
+			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> marked = loadFile("twoagents_maze_marked_" + (firstexperiment ? "firstexp.data" : "secondexp.data"),false);
 
 			start = Instant.now();
 			System.out.println("Start computing the synthesis at "+start);
@@ -147,12 +165,17 @@ public class AppMazeTwoAgents
 
 			stop = Instant.now();
 			elapsedTime = Duration.between(start, stop).toMillis();
-			System.out.println("Elapsed time "+elapsedTime);
+			System.out.println("Elapsed time "+elapsedTime+ " ms");
 
-			System.out.println("Exporting the strategy");
-			dc.exportMSCA(dir + "strategy", strategy);
+			if (strategy!=null) {
+				System.out.println("Exporting the strategy");
+				dc.exportMSCA("strategy", strategy);
+			} else {
+				System.out.println("The strategy is empty.");
+			}
 		}
 	}
+
 
 	private static Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> computesCompositionAndSaveIt(boolean legal) throws IOException, ParserConfigurationException, SAXException {
 
@@ -177,7 +200,7 @@ public class AppMazeTwoAgents
 
 		System.out.println("importing the maze image");
 
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>  maze = loadFile("io/github/contractautomata/maze/twoagentsproblem/resources/maze3.png",true);//pdc.importMSCA(dir+"maze3.png");
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>  maze = loadFile("maze3.png",true);//pdc.importMSCA(dir+"maze3.png");
 
 		BiFunction<String, Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>,
 				Set<ModalTransition<String,Action,State<String>,CALabel>>> relabel = (l,aut) ->
@@ -217,7 +240,7 @@ public class AppMazeTwoAgents
 
 		System.out.println("exporting...");
 
-		dc.exportMSCA(dir+"twoagents_maze"+(legal?"_legal":""), comp);
+		dc.exportMSCA("twoagents_maze"+(legal?"_legal":""), comp);
 
 		return comp;
 	}
@@ -245,7 +268,7 @@ public class AppMazeTwoAgents
 
 		System.out.println("Generating images...");
 
-		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> maze = loadFile("io/github/contractautomata/maze/twoagentsproblem/resources/maze3.png",true);// pdc.importMSCA(dir+"maze3.png");
+		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> maze = loadFile("maze3.png",true);// pdc.importMSCA(dir+"maze3.png");
 
 		aut.getStates().parallelStream()
 				.forEach(aut_s->{
@@ -263,7 +286,8 @@ public class AppMazeTwoAgents
 					try {
 						AutConverter<?,
 								Automaton<String,Action,State<String>,ModalTransition<String,Action,State<String>,CALabel>>> ac = pdc; //json?jdc:pdc;
-						ac.exportMSCA(dir+"twoagentsimages/png/"+JSonConverter.getstate.apply(aut_s), mazewithagents);
+						new File("./png").mkdirs();
+						ac.exportMSCA("./png/"+JSonConverter.getstate.apply(aut_s), mazewithagents);
 					} catch (Exception e) {
 						RuntimeException re = new RuntimeException();
 						re.addSuppressed(e);
@@ -277,9 +301,11 @@ public class AppMazeTwoAgents
 																																				   String initialkey, String forbiddenkey, boolean firstexperiment) throws IOException {
 		System.out.println("reading voxlogica computed file");
 		//parse the voxlogica json output and extract the information about initial, final and forbidden states
-		String content = Files.readAllLines(Paths.get(dir+"voxlogicaoutput/experiment2.json"))
-				.stream()
+		InputStream in = AppMazeTwoAgents.class.getClassLoader().getResourceAsStream("experiment2.json");
+		String content = new BufferedReader(new InputStreamReader(in,StandardCharsets.UTF_8))
+				.lines()
 				.collect(Collectors.joining(" "));
+
 		JSONArray obj = new JSONArray(content);
 
 		final Set<String> initialstate = extractFromJSON(obj, o-> o.getString("filename").contains("Close") && o.getJSONObject("results").getBoolean(initialkey));
@@ -287,7 +313,7 @@ public class AppMazeTwoAgents
 			throw new IllegalArgumentException();
 
 		final Set<String> finalstates = extractFromJSON(obj,o->o.getJSONObject("results").getBoolean(firstexperiment?"final":forbiddenkey));
-		final Set<String> forbiddenstates = extractFromJSON(obj,o->o.getJSONObject("results").getBoolean(firstexperiment?forbiddenkey:"final"));
+		final Set<String> forbiddenstates = extractFromJSON(obj,o->o.getJSONObject("results").getBoolean(firstexperiment?forbiddenkey:"final")); //in the second experiment final and forbidden are inverted
 
 		finalstates.removeAll(forbiddenstates); //final states cannot be forbidden
 
