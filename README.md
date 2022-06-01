@@ -1,4 +1,4 @@
-CATLib for Spatial Problems
+# CATLib and VoxLogicA tool chain for Spatial Synthesis
 
 This repository groups experiments being performed about applying CATLib to spatial problems, e.g., synthesising a strategy 
 enforcing spatial properties on a topological graph.
