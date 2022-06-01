@@ -5,12 +5,12 @@ enforcing spatial properties on a topological graph.
 
 ## Getting Started
 
-For reproducing the experiments of CATLib of our paper submitted to ISOLA2022, download the latest jar release, and launch it with:
+For reproducing the experiments of CATLib described in our paper submitted to ISOLA2022, download the latest jar release, and launch it with:
 
 `java -jar  maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar`
 
 and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents.java`.
-
+The release also contains the log of reproduction of the jar with the various options.
 
 
 ## Video demo
