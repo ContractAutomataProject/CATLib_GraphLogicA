@@ -9,6 +9,7 @@ import io.github.contractautomata.catlib.automaton.state.State;
 import io.github.contractautomata.catlib.automaton.transition.ModalTransition;
 import io.github.contractautomata.catlib.converters.AutDataConverter;
 import io.github.contractautomata.catlib.operations.*;
+import io.github.contractautomata.maze.converters.PngConverter;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,9 +18,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class AppGenerateTrace {
+public class AppGenerateInfo {
 
-    private final static String dir = System.getProperty("user.dir")+"/src/test/java/io/github/contractautomata/maze/resources/";
+    private final static String dir = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/";
     private final static AutDataConverter<CALabel> dc = new AutDataConverter<>(CALabel::new);
 
     public static void main(String[] args) throws IOException {
@@ -29,12 +30,24 @@ public class AppGenerateTrace {
 //        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> shortest = shortestPath(strategy);
 //        dc.exportMSCA(dir + "strategyShortest", shortest );
 
+        printAutomataInfo();
+    }
 
-        printStrategyInfo();
+
+    private static void printAutomataInfo() throws IOException {
+
+        List.of("agent","twoagents_maze","two_agents_maze_legal","two_agents_maze_marked_firstexp", "two_agents_maze_marked_secondexp","strategy")
+                .forEach(s->{
+                    try {
+                        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = dc.importMSCA(dir+s+ ".data");
+                        System.out.println(s + " has "+aut.getTransition().size() + " transitions and "+aut.getStates().size()+" states.");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    };});
     }
 
     private static void printCut( Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy) throws IOException {
-       Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = dc.importMSCA(dir + "io/github/contractautomata/maze/twoagentsproblem/resources/twoagents_maze3_marked.data");
+        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = dc.importMSCA(dir + "twoagents_maze_marked_firstexp.data");
 
         //all transitions in aut with source state in strategy and target state not in strategy
 
@@ -52,10 +65,6 @@ public class AppGenerateTrace {
 
     }
 
-    private static void printStrategyInfo() throws IOException {
-        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy = dc.importMSCA(dir+ "io/github/contractautomata/maze/twoagentsproblem/resources/strategy_twoagents_maze3.data");
-        System.out.println("There are "+strategy.getTransition().size() + " transitions and "+strategy.getStates().size()+" states.");
-    }
 
     private static Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> shortestPath(Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy){
         Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> temp;
@@ -89,7 +98,7 @@ public class AppGenerateTrace {
                         .flatMap(Function.identity())
                         .collect(Collectors.toSet()));
 
-    //    System.out.println(temp);
+        //    System.out.println(temp);
         return new MpcSynthesisOperator<String>(l->true,unfolder).apply(temp);
 
     }
