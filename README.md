@@ -10,7 +10,7 @@ For reproducing the experiments of CATLib described in our paper submitted to IS
 `java -jar  maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar`
 
 and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents.java`.
-The release also contains the log of reproduction of the jar with the various options.
+The release also contains the log of reproduction of the jar with the various options. OpenJDK11 or  a compatible version is required.
 
 For running VoxLogicA, first copy the png images generated from the previous step into 
 
