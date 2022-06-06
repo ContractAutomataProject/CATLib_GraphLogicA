@@ -19,7 +19,7 @@ except:
     basedir="."
 #%%
 
-baseimage = f'{basedir}/src/test/java/io/github/contractautomata/maze/resources/maze3.png'
+baseimage = f'{basedir}/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/maze3.png'
 datadir = f'{basedir}/src/test/java/io/github/contractautomata/maze/resources/twoagentsimages/png'
 images = [fname for fname in os.listdir(datadir) if fname.endswith(".png")]
 tmpdir = "./tmp"
@@ -32,6 +32,7 @@ def compute(specification,start=0,end=len(images)-1,images=images):
         print(f'Analysing {image}... ', end='')
         x = {"filename": image, "output": voxlogica.run_voxlogica(specification(image))}
         print('done')
+        #print(x["output"]["log"])        
         return x
 
     voxlogica_output = Parallel(n_jobs=num_cores)(delayed(processInput)(image) for image in images[start:end+1])
@@ -123,18 +124,17 @@ let final = exists(mrRed & exit) .&. exists(mrGreen & exit)
 {vlprint("sameRoom")}
 {vlprint("greenFlees")}
 {vlprint("nearby")}
-
-
-{vlsave(image,"door")}
-{vlsave(image,"exit")}
-{vlsave(image,"mrRed")}
-{vlsave(image,"mrGreen")}
-{vlsave(image,"pathToExit")}
-
-
-
-
 '''
+
+
+# {vlsave(image,"door")}
+# {vlsave(image,"exit")}
+# {vlsave(image,"mrRed")}
+# {vlsave(image,"mrGreen")}
+# {vlsave(image,"pathToExit")}
+
+
+
 items = []
 if (os.path.exists(cache)):    
     with open(cache) as f:
