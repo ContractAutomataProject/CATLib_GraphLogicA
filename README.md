@@ -12,7 +12,11 @@ For reproducing the experiments of CATLib described in our paper submitted to IS
 and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents.java`.
 The release also contains the log of reproduction of the jar with the various options.
 
-For running VoxLogicA download VoxLogicA 1.0 from here: 
+For running VoxLogicA, first copy the png images generated from the previous step into 
+
+`src/test/java/io/github/contractautomata/maze/resources/twoagentsimages/png`
+
+Then download VoxLogicA 1.0 from here: 
 
 https://github.com/vincenzoml/VoxLogicA/releases/tag/v1.0-experimental 
 
