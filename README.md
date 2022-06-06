@@ -16,7 +16,7 @@ For running VoxLogicA download VoxLogicA 1.0 from here:
 
 https://github.com/vincenzoml/VoxLogicA/releases/tag/v1.0-experimental 
 
-and unzip it into `src/main/python/io.github.contractautomata.maze/VoxLogicA/binaries` (create the directory `VoxLogicA/binaries` if it does not exist). Then run the python script `src/main/python/io.github.contractautomata.maze/orchestrate.py` which generates a file called `cache.json`. A copy of this file is shipped in the aforementioned jar file, with path `PATH/TO/NAME.JSON`
+and unzip it into `src/main/python/io.github.contractautomata.maze/VoxLogicA/binaries` (create the directory `VoxLogicA/binaries` if it does not exist). Then run the python script `src/main/python/io.github.contractautomata.maze/orchestrate.py` which generates a file called `cache.json`. A copy of this file is shipped in the root directory of the aforementioned jar file, with path `experiment2.json` and can be replaced. 
 
 
 ## Video demo
