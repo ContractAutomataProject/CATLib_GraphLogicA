@@ -3,7 +3,7 @@
 This repository groups experiments being performed about applying CATLib to spatial problems, e.g., synthesising a strategy 
 enforcing spatial properties on a topological graph.
 
-This software has been developed for to the publication "An Experimental Toolchain for Strategy Synthesis with Spatial Properties", by Davide Basile, Maurice H. ter Beek & Vincenzo Ciancia, published in the Proceeding of the 11th International Symposium on Leveraging Applications of Formal Methods, Verification and Validation,  Adaptation and Learning.  ISoLA 2022, Rhodes, Greece, October 22–30, 2022,  Part III, https://doi.org/10.1007/978-3-031-19759-8 
+This software has been developed for to the publication "An Experimental Toolchain for Strategy Synthesis with Spatial Properties", by Davide Basile, Maurice H. ter Beek & Vincenzo Ciancia, published in the Proceeding of the 11th International Symposium on Leveraging Applications of Formal Methods, Verification and Validation,  Adaptation and Learning.  ISoLA 2022, Rhodes, Greece, October 22–30, 2022,  Part III, https://doi.org/10.1007/978-3-031-19759-8_10 
 
 ## Getting Started
 
