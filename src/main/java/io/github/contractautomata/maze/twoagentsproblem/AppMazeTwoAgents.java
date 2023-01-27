@@ -51,9 +51,11 @@ public class AppMazeTwoAgents
 
 	public static void main( String[] args ) throws Exception
 	{
-//		initial1 forbidden1
-//		initial1 forbidden2
+
+//		initial1 forbidden1 - experiment 1
+//		initial1 forbidden2 - experiment 2
 //		initial2 forbidden1 - expected empty
+//		initial1, initial2, forbidden1, forbidden2 are the names of the attributes used in the experiment2.json file (output of VoxLogicA)
 
 		String message = "Usage : java -jar -Xss1000M maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar [options] \n" +
 				"where options are :\n" +
@@ -107,6 +109,7 @@ public class AppMazeTwoAgents
 				break;
 			}
 		}
+
 		if (computeMarkingOfComposition || synthesis) {
 			firstexperiment = (exp.equals("1"));
 			secondexperiment = (exp.equals("2"));
@@ -202,6 +205,13 @@ public class AppMazeTwoAgents
 
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>  maze = loadFile("maze3.png",true);//pdc.importMSCA(dir+"maze3.png");
 
+		//relabel bifunction is used to set the initial state of the two agents
+		//whose set of transitions is called here maze_tr and maze2_tr.
+		//Basically, they only differ in the initial state, whilst the final
+		//states are all cells with colour #000000.
+		//Note that the initial coordinates of the agents are hardcoded here, (1; 1; 0) for agent 1,
+		//and (1; 2; 0) for agent 2.
+		//However, when marking the composition, the initial states will be loaded from VoxLogicA.
 		BiFunction<String, Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>,
 				Set<ModalTransition<String,Action,State<String>,CALabel>>> relabel = (l,aut) ->
 				new RelabelingOperator<String,CALabel>(CALabel::new,s->s,s->s.getState().split("_")[0].equals(l),
@@ -308,6 +318,8 @@ public class AppMazeTwoAgents
 
 		JSONArray obj = new JSONArray(content);
 
+		//there are two states where the coordinates of the agents are those of "initialkey", one where the gate is closed
+		//and one where it is opened. We select the one where the gate is closed.
 		final Set<String> initialstate = extractFromJSON(obj, o-> o.getString("filename").contains("Close") && o.getJSONObject("results").getBoolean(initialkey));
 		if (initialstate.size()!=1)
 			throw new IllegalArgumentException();
@@ -319,14 +331,11 @@ public class AppMazeTwoAgents
 
 		//System.out.println(finalstates);
 
-		BiPredicate<State<String>,Set<String>> pred =  (s,set) -> set.parallelStream()
-				.anyMatch(x->x.equals(JSonConverter.getstate.apply(s)));
 
 		System.out.println("Updating the automaton");
 
 		//reset initial and final states to false
 		RelabelingOperator<String,CALabel> ro = new RelabelingOperator<>(CALabel::new,x->x,x->false,x->false);
-
 
 		System.out.println("Reset initial and final states, and selected agents to uncontrollable");
 		//turn the moves of the opponent to uncontrollable
@@ -335,22 +344,29 @@ public class AppMazeTwoAgents
 						(t.getLabel().getContent().get(3) instanceof IdleAction)?
 								(firstexperiment?Modality.PERMITTED: ModalTransition.Modality.URGENT) //first experiment: agents controllable, gate uncontrollable
 								:(firstexperiment?Modality.URGENT: ModalTransition.Modality.PERMITTED)//second experiment: agents uncontrollable, gate controllable
-
-				))
-				.collect(Collectors.toSet());
+				)).collect(Collectors.toSet());
 
 		System.out.println("State Marking ... ");
 
 		//mark initial, final and forbidden states
+
+		//firstly, two new states initial and final are generated.
 		BasicState<String> bsi = new BasicState<>("Init",true,false);
 		final State<String> init = new State<>(List.of(bsi,bsi,bsi,bsi));
 		final State<String> finalstate = new State<>(IntStream.range(0,4)
 				.mapToObj(i->new BasicState<>("Final",false,true))
 				.collect(Collectors.toList()));
 
+		// on forbidden states a self loop is added with a urgent request
 		Function<State<String>, ModalTransition<String, Action, State<String>, CALabel>> f_forbidden =
 				(State<String> s)->new ModalTransition<>(s,new CALabel(s.getRank(),0,new RequestAction("forbidden")),s,Modality.URGENT);
 
+
+		BiPredicate<State<String>,Set<String>> pred =  (s,set) -> set.parallelStream()
+				.anyMatch(x->x.equals(JSonConverter.getstate.apply(s)));
+
+
+		//we add to the transitions those outgoing from "Init" to the initial state, and from the final states to "Final"
 		setr.addAll(Map.of(initialstate,(State<String> s)-> new ModalTransition<>(init,new CALabel(s.getRank(),0,new OfferAction("start")),s,Modality.PERMITTED),
 						finalstates,(State<String> s)->new ModalTransition<>(s, new CALabel(s.getRank(),0,new OfferAction("stop")),	finalstate,Modality.PERMITTED),
 						forbiddenstates,f_forbidden)
@@ -384,4 +400,3 @@ public class AppMazeTwoAgents
 	}
 
 }
-
