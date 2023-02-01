@@ -66,8 +66,8 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										io.github.contractautomata.maze.twoagentsproblem.AppMazeTwoAgents
-									</mainClass>
+                                        io.github.contractautomata.maze.twoagentsproblem.AppMazeTwoAgents_STTT_SI_ISOLA2022
+                                    </mainClass>
 								</manifest>
 							</archive>
 							<descriptorRefs>

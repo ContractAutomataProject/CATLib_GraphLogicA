@@ -26,8 +26,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -39,7 +37,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class AppMazeTwoAgents
+public class AppMazeTwoAgents_ISOLA2022
 {
 
 	private final static String gateCoordinates = "(2; 7; 0)";
@@ -61,7 +59,7 @@ public class AppMazeTwoAgents
 				"where options are :\n" +
 				"-composition   (compute and store the whole composition) \n" +
 				"-generateimages (generate an image for each state of the composition) \n" +
-				"-legalcomposition   (compute and store the composition with only legal moves) \n" +
+				"-legalcomposition (compute and store the composition with only legal moves) \n" +
 				"-markcomposition [1|2] (compute the composition marked with properties from voxlogica logs for either experiment 1 or 2) \n" +
 				"-synthesis [1|2] (synthesise and store the strategy  for either experiment 1 or 2) \n";
 
@@ -311,7 +309,7 @@ public class AppMazeTwoAgents
 																																				   String initialkey, String forbiddenkey, boolean firstexperiment) throws IOException {
 		System.out.println("reading voxlogica computed file");
 		//parse the voxlogica json output and extract the information about initial, final and forbidden states
-		InputStream in = AppMazeTwoAgents.class.getClassLoader().getResourceAsStream("experiment2.json");
+		InputStream in = AppMazeTwoAgents_ISOLA2022.class.getClassLoader().getResourceAsStream("experiment2.json");
 		String content = new BufferedReader(new InputStreamReader(in,StandardCharsets.UTF_8))
 				.lines()
 				.collect(Collectors.joining(" "));
@@ -390,7 +388,7 @@ public class AppMazeTwoAgents
 	}
 
 	private static Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> loadFile(String filename, boolean image) throws IOException, ParserConfigurationException, SAXException {
-		InputStream in = AppMazeTwoAgents.class.getClassLoader().getResourceAsStream(filename);
+		InputStream in = AppMazeTwoAgents_ISOLA2022.class.getClassLoader().getResourceAsStream(filename);
 		File f = new File(filename);
 		FileUtils.copyInputStreamToFile(in, f);
 
