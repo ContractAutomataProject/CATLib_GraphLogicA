@@ -23,6 +23,8 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -40,12 +42,12 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 {
 
 	private static String gateCoordinates = "(2; 7; 0)";
-	private static String path_to_image = "maze3.png";
+	private static String path_to_image = "target/maze3.png";
 	private static String agent1coordinates = "(1; 1; 0)";
 	private static String agent2coordinates = "(1; 2; 0)";
-	private static String path_to_voxlogica_output = "experiment2.json";
-	private static String outputCompositionPath = "composition.data";
-	private static String inputCompositionPath = "composition.data";
+	private static String path_to_voxlogica_output = "target/experimentsSTTT.json";
+	private static String outputCompositionPath = "target/composition.data";
+	private static String inputCompositionPath = "target/composition.data";
 
 	private final static PngConverter pdc = new PngConverter();
 	private final static AutDataConverter<CALabel> dc = new AutDataConverter<>(CALabel::new);
@@ -57,6 +59,13 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 //		initial1 forbidden2 - experiment 2
 //		initial2 forbidden1 - expected empty
 //		initial1, initial2, forbidden1, forbidden2 are the names of the attributes used in the json file (output of VoxLogicA)
+
+
+//		readVoxLogicaOutputAndMarkStates(dc.importMSCA(inputCompositionPath),"forbidden2", true);
+//
+//		if (true)
+//			return;
+
 
 		String message = "Usage : java -jar -Xss1000M maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar [options] \n" +
 				"where options are : \n" +
@@ -73,8 +82,8 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		boolean firstexperiment=false;
 		boolean secondexperiment;
 		boolean phase1=false;
-		boolean phase2=false;
-		String exp="";
+		boolean phase2=true;
+		String exp="2";
 		Instant start, stop;
 		long elapsedTime;
 
@@ -299,23 +308,28 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 
 	private static Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> readVoxLogicaOutputAndMarkStates(Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut,
-																																				   String forbiddenkey, boolean firstexperiment)  {
+																																				   String forbiddenkey, boolean firstexperiment) throws IOException {
 		System.out.println("reading voxlogica computed file");
 		//parse the voxlogica json output and extract the information about initial, final and forbidden states
-		InputStream in = AppMazeTwoAgents_STTT_SI_ISOLA2022.class.getClassLoader().getResourceAsStream(path_to_voxlogica_output);
-		String content = new BufferedReader(new InputStreamReader(in,StandardCharsets.UTF_8))
-				.lines()
+
+//		InputStream in = AppMazeTwoAgents_STTT_SI_ISOLA2022.class.getClassLoader().getResourceAsStream(path_to_voxlogica_output);
+//		String content = new BufferedReader(new InputStreamReader(in,StandardCharsets.UTF_8))
+//				.lines()
+//				.collect(Collectors.joining(" "));
+
+		String content =Files.readAllLines(Path.of(path_to_voxlogica_output))
+				.stream()
 				.collect(Collectors.joining(" "));
+
 
 		JSONArray obj = new JSONArray(content);
 
 
 		final Set<String> initialstate = Set.of("["+agent1coordinates.replaceAll(";", ",")+","+agent2coordinates.replaceAll(";", ",")+",Driver,Close]");
 
+		final Set<String> finalstates = extractFromJSON2(obj,firstexperiment?"final":forbiddenkey);
+		final Set<String> forbiddenstates = extractFromJSON2(obj,firstexperiment?forbiddenkey:"final"); //in the second experiment final and forbidden are inverted
 
-
-		final Set<String> finalstates = extractFromJSON(obj,o->o.getJSONObject("results").getBoolean(firstexperiment?"final":forbiddenkey));
-		final Set<String> forbiddenstates = extractFromJSON(obj,o->o.getJSONObject("results").getBoolean(firstexperiment?forbiddenkey:"final")); //in the second experiment final and forbidden are inverted
 
 		finalstates.removeAll(forbiddenstates); //final states cannot be forbidden
 
@@ -368,23 +382,24 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		return new Automaton<>(setr);
 	}
 
-	private static Set<String> extractFromJSON(JSONArray obj, Predicate<JSONObject> pred){
+//	private static Set<String> extractFromJSON(JSONArray obj, Predicate<JSONObject> pred){
+//		return IntStream.range(0,obj.length())
+//				.mapToObj(obj::getJSONObject)
+//				.peek(System.out::println)
+//				.filter(pred)
+//				.map(o->o.getString("filename").split(".png")[0])
+//				.collect(Collectors.toSet());
+//	}
+
+	private static Set<String> extractFromJSON2(JSONArray obj, String key){
 		return IntStream.range(0,obj.length())
 				.mapToObj(obj::getJSONObject)
-				//	.peek(System.out::println)
-				.filter(pred)
-				.map(o->o.getString("filename").split(".png")[0])
+				.map(o->o.getJSONObject("results"))
+				.flatMap(o->o.toMap().entrySet().parallelStream()
+						.filter(e->e.getKey().contains(key))
+						.filter(e->(Boolean) e.getValue())
+						.map(e->e.getKey().split("_")[1].split(".png")[0]))
 				.collect(Collectors.toSet());
 	}
-
-//	private static Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> loadFile(String filename, boolean image) throws IOException, ParserConfigurationException, SAXException {
-//		InputStream in = AppMazeTwoAgents_STTT_SI_ISOLA2022.class.getClassLoader().getResourceAsStream(filename);
-//		File f = new File(filename);
-//		FileUtils.copyInputStreamToFile(in, f);
-//
-//		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>>  aut = (image?pdc:dc).importMSCA(filename);
-//		f.delete();
-//		return aut;
-//	}
 
 }
