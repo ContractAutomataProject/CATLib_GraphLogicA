@@ -19,10 +19,9 @@ import io.github.contractautomata.catlib.requirements.Agreement;
 import io.github.contractautomata.maze.converters.JSonConverter;
 import io.github.contractautomata.maze.converters.PngConverter;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -42,12 +41,14 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 {
 
 	private static String gateCoordinates = "(2; 7; 0)";
-	private static String path_to_image = "target/maze3.png";
 	private static String agent1coordinates = "(1; 1; 0)";
 	private static String agent2coordinates = "(1; 2; 0)";
-	private static String path_to_voxlogica_output = "target/experimentsSTTT.json";
-	private static String outputCompositionPath = "target/composition.data";
-	private static String inputCompositionPath = "target/composition.data";
+
+
+	private static String path_to_image = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/maze3.png";
+	private static String path_to_voxlogica_output =  System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/experimentsSTTT.json";
+	private static String outputCompositionPath =System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/composition.data";
+	private static String inputCompositionPath = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/composition.data";
 
 	private final static PngConverter pdc = new PngConverter();
 	private final static AutDataConverter<CALabel> dc = new AutDataConverter<>(CALabel::new);
@@ -61,8 +62,15 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 //		initial1, initial2, forbidden1, forbidden2 are the names of the attributes used in the json file (output of VoxLogicA)
 
 
-//		readVoxLogicaOutputAndMarkStates(dc.importMSCA(inputCompositionPath),"forbidden2", true);
+//		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> older = dc.importMSCA(System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/twoagents_maze_marked_firstexp.data");
+//		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> newer = dc.importMSCA(System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/twoagents_maze_marked_firstexp_new.data");
 //
+//		System.out.println(older.getTransition().stream()
+//				.filter(t->t.getTarget().isFinalState())
+//				.count());
+//		System.out.println(newer.getTransition().stream()
+//				.filter(t->t.getTarget().isFinalState())
+//				.count());
 //		if (true)
 //			return;
 
@@ -80,14 +88,16 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 				"-voxLogica_output_path String (the path where the output of VoxLogica is located) ";
 
 		boolean firstexperiment=false;
-		boolean secondexperiment;
+		boolean secondexperiment=false;
 		boolean phase1=false;
 		boolean phase2=true;
-		String exp="2";
+		String exp="1";
 		Instant start, stop;
 		long elapsedTime;
 
+
 		System.out.println( "Maze example with two agents." );
+
 
 		if (args==null || args.length==0) {
 			System.out.println(message);
@@ -179,6 +189,12 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 			stop = Instant.now();
 			elapsedTime = Duration.between(start, stop).toMillis();
 			System.out.println("Elapsed time " + elapsedTime + " ms");
+
+			dc.exportMSCA("twoagents_maze_marked_firstexp_new",marked);
+
+			marked.getStates().stream()
+					.filter(s->s.isFinalState())
+					.forEach(System.out::println);
 
 			System.out.println("Start computing the synthesis at "+start);
 			Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy =
@@ -312,24 +328,16 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		System.out.println("reading voxlogica computed file");
 		//parse the voxlogica json output and extract the information about initial, final and forbidden states
 
-//		InputStream in = AppMazeTwoAgents_STTT_SI_ISOLA2022.class.getClassLoader().getResourceAsStream(path_to_voxlogica_output);
-//		String content = new BufferedReader(new InputStreamReader(in,StandardCharsets.UTF_8))
-//				.lines()
-//				.collect(Collectors.joining(" "));
-
 		String content =Files.readAllLines(Path.of(path_to_voxlogica_output))
 				.stream()
 				.collect(Collectors.joining(" "));
 
-
 		JSONArray obj = new JSONArray(content);
 
+		final Set<String> initialstate = Set.of(agent1coordinates.replaceAll(";", ",")+","+agent2coordinates.replaceAll(";", ",")+",Driver,Close");
 
-		final Set<String> initialstate = Set.of("["+agent1coordinates.replaceAll(";", ",")+","+agent2coordinates.replaceAll(";", ",")+",Driver,Close]");
-
-		final Set<String> finalstates = extractFromJSON2(obj,firstexperiment?"final":forbiddenkey);
-		final Set<String> forbiddenstates = extractFromJSON2(obj,firstexperiment?forbiddenkey:"final"); //in the second experiment final and forbidden are inverted
-
+		final Set<String> finalstates = extractFromJSON(obj,firstexperiment?"final":forbiddenkey);
+		final Set<String> forbiddenstates = extractFromJSON(obj,firstexperiment?forbiddenkey:"final"); //in the second experiment final and forbidden are inverted
 
 		finalstates.removeAll(forbiddenstates); //final states cannot be forbidden
 
@@ -352,9 +360,10 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 		//mark initial, final and forbidden states
 
-		//firstly, two new states initial and final are generated.
+		//firstly, two new states, initial and final, are generated.
 		BasicState<String> bsi = new BasicState<>("Init",true,false);
 		final State<String> init = new State<>(List.of(bsi,bsi,bsi,bsi));
+
 		final State<String> finalstate = new State<>(IntStream.range(0,4)
 				.mapToObj(i->new BasicState<>("Final",false,true))
 				.collect(Collectors.toList()));
@@ -365,6 +374,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 
 		BiPredicate<State<String>,Set<String>> pred =  (s,set) -> set.parallelStream()
+		//		.peek(x->{if (x.equals(initialstate.iterator().next()))  System.out.println(x+" ---- " + JSonConverter.getstate.apply(s));})
 				.anyMatch(x->x.equals(JSonConverter.getstate.apply(s)));
 
 
@@ -382,16 +392,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		return new Automaton<>(setr);
 	}
 
-//	private static Set<String> extractFromJSON(JSONArray obj, Predicate<JSONObject> pred){
-//		return IntStream.range(0,obj.length())
-//				.mapToObj(obj::getJSONObject)
-//				.peek(System.out::println)
-//				.filter(pred)
-//				.map(o->o.getString("filename").split(".png")[0])
-//				.collect(Collectors.toSet());
-//	}
-
-	private static Set<String> extractFromJSON2(JSONArray obj, String key){
+	private static Set<String> extractFromJSON(JSONArray obj, String key){
 		return IntStream.range(0,obj.length())
 				.mapToObj(obj::getJSONObject)
 				.map(o->o.getJSONObject("results"))
