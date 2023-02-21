@@ -87,6 +87,7 @@ def run_voxlogica(contents=None, filename=None, substitutions={}, gpu=True, ptes
             if debug:
                 return output
             else:
+                print(output)
                 res = json.loads(output)
                 res["exitcode"] = exitcode
                 if exitcode == 0:

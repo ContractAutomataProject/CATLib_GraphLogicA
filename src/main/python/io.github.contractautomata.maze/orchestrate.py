@@ -24,18 +24,37 @@ datadir = f'{basedir}/src/test/java/io/github/contractautomata/maze/resources/tw
 images = [fname for fname in os.listdir(datadir) if fname.endswith(".png")]
 tmpdir = "./tmp"
 cache = "./cache.json"
+#image_start = 160
+batch = 150
+batches = int(len(images) / batch) + 1
+
 # Result computation and auxiliary function "view"
 def compute(specification,start=0,end=len(images)-1,images=images):
     num_cores = 1 #multiprocessing.cpu_count()
+    files = []
+    specs = []
+    for k in range(0, batches):
+        file, spec = specification(k)
+        files.append(file)
+        specs.append(spec)
+        #print(spec)
+    print("there are " + str(len(images)) + " images")  
+    
+    #print(batches)
 
-    def processInput(image):
-        print(f'Analysing {image}... ', end='')
-        x = {"filename": image, "output": voxlogica.run_voxlogica(specification(image))}
-        print('done')
-        #print(x["output"]["log"])        
-        return x
+    def processInput(i):
+        global batch
+        #global images
+        start = i*batch
+        #image_start = start
+        results = {"filename": files[0], "output": voxlogica.run_voxlogica(specs[i])}
+        print(results)
+        #print(x['filename'])
+        #print('done')
+        return results
 
-    voxlogica_output = Parallel(n_jobs=num_cores)(delayed(processInput)(image) for image in images[start:end+1])
+    voxlogica_output = Parallel(n_jobs=num_cores)(delayed(processInput)(i) for i in range(0,batches))
+    #print(voxlogica_output)
 
     return voxlogica.simplify_results(voxlogica_output)
 
@@ -70,12 +89,10 @@ def vlsave(image,var):
 def vlprint(var):
     return f'print "{var}" {var}'
 
-def specification(image):
-    return f'''
+def specification(index):
+    global batch
+    text = f'''
 
-load base ="{baseimage}"
-
-load img = "{datadir}/{image}"
 let r = red(img)
 let g = green(img)
 let b = blue(img)
@@ -114,17 +131,42 @@ let forbidden2 = forbidden1 .|. (!. nearby)
 
 let final = exists(mrRed & exit) .&. exists(mrGreen & exit)
 
-{vlprint("initial1")}
-{vlprint("initial2")}
-{vlprint("forbidden1")}
-{vlprint("forbidden2")}
-{vlprint("final")}
-{vlprint("canExit(mrGreen)")}
-{vlprint("wrong")}
-{vlprint("sameRoom")}
-{vlprint("greenFlees")}
-{vlprint("nearby")}
 '''
+    new_text = ""
+    filenames = [name for name in images[batch*index: batch*(index+1)]]
+    for image_name in filenames:
+        #print("inside spec")
+        fname = f'''let filename = "{image_name}"'''
+        base_name = f'''load base ="{baseimage}"\n'''
+        new_text += fname
+        new_text += base_name
+        string_set = ["initial1_"+image_name,
+                      "initial2_"+image_name,
+                      "forbidden1_"+image_name,
+                      "forbidden2_"+image_name,
+                      "final_"+image_name,
+                      "canExit(mrGreen)_"+image_name,
+                      "wrong_"+image_name,
+                      "sameRoom_"+image_name,
+                      "greenFlees_"+image_name,
+                      "nearby_"+image_name]
+        new_text += f'''load img = "{datadir}/{image_name}"\n''' + text
+        new_text += f'''
+        
+            print "{string_set[0]}" initial1
+            print "{string_set[1]}" initial2
+            print "{string_set[2]}" forbidden1
+            print "{string_set[3]}" forbidden2
+            print "{string_set[4]}" final
+            print "{string_set[5]}" canExit(mrGreen)
+            print "{string_set[6]}" wrong
+            print "{string_set[7]}" sameRoom
+            print "{string_set[8]}" greenFlees
+            print "{string_set[9]}" nearby\n
+
+            '''
+    
+    return filenames, new_text
 
 
 # {vlsave(image,"door")}
@@ -161,3 +203,4 @@ with open("cache.json", 'w') as f:
     json.dump(final, f)    
 
 # %%
+
