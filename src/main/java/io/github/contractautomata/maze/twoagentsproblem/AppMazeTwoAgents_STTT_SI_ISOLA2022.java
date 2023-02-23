@@ -40,14 +40,14 @@ import java.util.stream.Stream;
 public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 {
 
+	//by default the set-up is the one of the first two experiments
 	private static String gateCoordinates = "(2; 7; 0)";
 	private static String agent1coordinates = "(1; 1; 0)";
 	private static String agent2coordinates = "(1; 2; 0)";
-
-
 	private static String path_to_image = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/maze3.png";
-	private static String path_to_voxlogica_output =  System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/experimentsSTTT.json";
-	private static String outputCompositionPath =System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/composition.data";
+
+	private static String path_to_voxlogica_output = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/experimentsSTTT.json";
+	private static String outputCompositionPath = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/composition.data";
 	private static String inputCompositionPath = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/composition.data";
 
 	private final static PngConverter pdc = new PngConverter();
@@ -55,30 +55,11 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 	public static void main( String[] args ) throws Exception {
 
-
-//		initial1 forbidden1 - experiment 1
-//		initial1 forbidden2 - experiment 2
-//		initial2 forbidden1 - expected empty
-//		initial1, initial2, forbidden1, forbidden2 are the names of the attributes used in the json file (output of VoxLogicA)
-
-
-//		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> older = dc.importMSCA(System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/twoagents_maze_marked_firstexp.data");
-//		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> newer = dc.importMSCA(System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/twoagents_maze_marked_firstexp_new.data");
-//
-//		System.out.println(older.getTransition().stream()
-//				.filter(t->t.getTarget().isFinalState())
-//				.count());
-//		System.out.println(newer.getTransition().stream()
-//				.filter(t->t.getTarget().isFinalState())
-//				.count());
-//		if (true)
-//			return;
-
-
 		String message = "Usage : java -jar -Xss1000M maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar [options] \n" +
 				"where options are : \n" +
 				"-phase1 (compute the composition and generate the images) \n" +
-				"-phase2 [1|2] (read the logs of voxlogica and perform the synthesis for either experiment 1 or 2) \n"+
+				"-phase2 (read the logs of voxlogica and perform the synthesis) \n"+
+				"-experiment [1|2|3] (select either experiment 1, 2 or 3)\n" +
 				"-gateCoordinates x y \n" +
 				"-position_agent_1 x y  \n" +
 				"-position_agent_2 x y \n" +
@@ -87,17 +68,14 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 				"-inputCompositionPath String (the path where the composition has been stored) \n"+
 				"-voxLogica_output_path String (the path where the output of VoxLogica is located) ";
 
-		boolean firstexperiment=false;
-		boolean secondexperiment=false;
 		boolean phase1=false;
-		boolean phase2=true;
-		String exp="1";
+		boolean phase2=false;
+		String exp="";
 		Instant start, stop;
 		long elapsedTime;
 
 
 		System.out.println( "Maze example with two agents." );
-
 
 		if (args==null || args.length==0) {
 			System.out.println(message);
@@ -133,13 +111,15 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 					break;
 				case "-phase2":
 					phase2 = true;
+					break;
+				case "-experiment":
 					exp = args[++i];
 					break;
 			}
 		}
 
-
 		System.out.println("The set-up is:" +"\n"+
+				"experiment="+exp+"\n"+
 				"gateCoordinates="+gateCoordinates+"\n"+
 				"position_agent_1="+agent1coordinates+"\n"+
 				"position_agent_2="+agent2coordinates+"\n"+
@@ -148,19 +128,17 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 				"inputCompositionPath="+inputCompositionPath+"\n"+
 				"voxLogica_output_path="+path_to_voxlogica_output);
 
-		if (phase2) {
-			firstexperiment = (exp.equals("1"));
-			secondexperiment = (exp.equals("2"));
-			if (!firstexperiment && !secondexperiment) {
-				System.out.println(message);
-				return;
-			}
+		if (exp.equals("3")){
+			agent1coordinates="(0; 4; 0)";
+			agent2coordinates="(2; 4; 0)";
+			gateCoordinates="(4; 4; 0)";
+			path_to_image = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/trainExample.png";
 		}
 
 		if (phase1) {
 			start = Instant.now();
 			System.out.println("Computing composition..." + start);
-			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> comp = computesComposition();
+			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> comp = computesComposition(exp);
 			stop = Instant.now();
 			elapsedTime = Duration.between(start, stop).toMillis();
 			System.out.println("Elapsed time " + elapsedTime + " ms");
@@ -177,14 +155,13 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 			dc.exportMSCA(outputCompositionPath, comp);
 		}
 		if (phase2) {
+
 			start = Instant.now();
 			System.out.println("Start marking automaton with voxlogica output at " + start);
 			System.out.println("Importing legal composition ");
 			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> comp = dc.importMSCA(inputCompositionPath);//loadFile("composition.data", false);
 
-
-			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> marked = readVoxLogicaOutputAndMarkStates(comp,
-					firstexperiment ? "forbidden2" : "forbidden1", firstexperiment); //computing
+			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> marked = readVoxLogicaOutputAndMarkStates(comp,exp); //computing
 
 			stop = Instant.now();
 			elapsedTime = Duration.between(start, stop).toMillis();
@@ -214,18 +191,18 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 	}
 
 
-	private static Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> computesComposition() throws IOException{
+	private static Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> computesComposition(String exp) throws IOException{
 
 		//compute the composition of two agents and a driver and export it
 		System.out.println("create driver and door...");
 
 		final State<String> stateDriver = new State<>(List.of(new BasicState<>("Driver",true,true)));
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> driver =
-				new Automaton<>(Stream.of("goup","godown","goleft","goright")
+				new Automaton<>((exp.equals("3")?Stream.of("goup","godown","goright")
+												:Stream.of("goup","godown","goleft","goright"))
 						.map(s->new CALabel(1,0,new OfferAction(s)))
 						.map(act->new ModalTransition<>(stateDriver,act,stateDriver,Modality.PERMITTED))
 						.collect(Collectors.toSet()));
-
 
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> door =
 				new Automaton<>(Map.of(new State<>(List.of(new BasicState<>("Close",true,false))),
@@ -251,14 +228,6 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 		Set<ModalTransition<String,Action,State<String>,CALabel>> maze_tr = relabel.apply(agent1coordinates,maze);
 		Set<ModalTransition<String,Action,State<String>,CALabel>> maze2_tr = relabel.apply(agent2coordinates,maze);
-
-		//		dc.exportMSCA(dir+"maze2.data",maze);
-		//		MSCA maze = dc.importMSCA(dir+"maze2.aut.data");
-
-
-//		Stream.of(maze_tr, maze2_tr)
-//				.forEach(set->{//addInitialState(set);
-//					setForbiddenStates(set,s->s.getState().get(0).getState().contains("#000000"));});
 
 		Predicate<State<String>> badState = s->
 				//two agents on the same cell
@@ -324,10 +293,11 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 
 	private static Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> readVoxLogicaOutputAndMarkStates(Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut,
-																																				   String forbiddenkey, boolean firstexperiment) throws IOException {
-		System.out.println("reading voxlogica computed file");
-		//parse the voxlogica json output and extract the information about initial, final and forbidden states
+																																				   String exp) throws IOException {
 
+		System.out.println("reading voxlogica computed file");
+
+		//parse the voxlogica json output and extract the information about initial, final and forbidden states
 		String content =Files.readAllLines(Path.of(path_to_voxlogica_output))
 				.stream()
 				.collect(Collectors.joining(" "));
@@ -336,11 +306,20 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 		final Set<String> initialstate = Set.of(agent1coordinates.replaceAll(";", ",")+","+agent2coordinates.replaceAll(";", ",")+",Driver,Close");
 
-		final Set<String> finalstates = extractFromJSON(obj,firstexperiment?"final":forbiddenkey);
-		final Set<String> forbiddenstates = extractFromJSON(obj,firstexperiment?forbiddenkey:"final"); //in the second experiment final and forbidden are inverted
+		Set<String> finalstates=null;
+		Set<String> forbiddenstates=null;
+
+		if (!exp.equals("3")) {
+			String forbiddenkey = exp.equals("1") ? "forbidden1" : "forbidden2";
+			finalstates = extractFromJSON(obj, exp.equals("1") ? "final" : forbiddenkey);
+			forbiddenstates = extractFromJSON(obj, exp.equals("1") ? forbiddenkey : "final"); //in the second experiment final and forbidden are inverted
+		}
+		else {
+				//final: 		trains in 10,2 and 10,4
+				//forbidden: 	both trains right of the gate but no train has arrived yet
+		}
 
 		finalstates.removeAll(forbiddenstates); //final states cannot be forbidden
-
 
 		System.out.println("Updating the automaton");
 
@@ -352,8 +331,8 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		Set<ModalTransition<String, Action, State<String>, CALabel>> setr = ro.apply(aut).parallelStream()
 				.map(t->new ModalTransition<>(t.getSource(),t.getLabel(),t.getTarget(),
 						(t.getLabel().getContent().get(3) instanceof IdleAction)?
-								(firstexperiment?Modality.PERMITTED: Modality.URGENT) //first experiment: agents controllable, gate uncontrollable
-								:(firstexperiment?Modality.URGENT: Modality.PERMITTED)//second experiment: agents uncontrollable, gate controllable
+								(exp.equals("1")?Modality.PERMITTED: Modality.URGENT) //first experiment: agents controllable, gate uncontrollable
+								:(exp.equals("1")?Modality.URGENT: Modality.PERMITTED)//second and third experiment: agents uncontrollable, gate controllable
 				)).collect(Collectors.toSet());
 
 		System.out.println("State Marking ... ");
@@ -392,6 +371,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		return new Automaton<>(setr);
 	}
 
+
 	private static Set<String> extractFromJSON(JSONArray obj, String key){
 		return IntStream.range(0,obj.length())
 				.mapToObj(obj::getJSONObject)
@@ -403,4 +383,17 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 				.collect(Collectors.toSet());
 	}
 
+	private static void test() throws IOException {
+		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> older = dc.importMSCA(System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/twoagents_maze_marked_firstexp.data");
+		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> newer = dc.importMSCA(System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/twoagents_maze_marked_firstexp_new.data");
+
+		System.out.println(older.getTransition().stream()
+				.filter(t->t.getTarget().isFinalState())
+				.count());
+		System.out.println(newer.getTransition().stream()
+				.filter(t->t.getTarget().isFinalState())
+				.count());
+		if (true)
+			return;
+	}
 }
