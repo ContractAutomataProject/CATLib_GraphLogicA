@@ -7,6 +7,14 @@ import sys
 python_dir_path = "./src/main/python/io.github.contractautomata.maze"
 sys.path.append(python_dir_path)
 import orchestrate
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--arg1", type=int, required=True)
+parser.add_argument("--arg2", type=float, required=True)
+parser.add_argument("--arg3", type=str)
+
+args = parser.parse_args()
 
 # Run the Java jar file
 jar_file_path = "./maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar"
