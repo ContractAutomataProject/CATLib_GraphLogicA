@@ -19,22 +19,23 @@ except:
     basedir="."
 #%%
 
+##### Per VL ####
 baseimage = f'{basedir}/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/maze3.png'
 datadir = f'{basedir}/src/test/java/io/github/contractautomata/maze/resources/twoagentsimages/png'
+#### end ####
 images = [fname for fname in os.listdir(datadir) if fname.endswith(".png")]
 tmpdir = "./tmp"
 cache = "./cache.json"
-#image_start = 160
 batch = 150
 batches = int(len(images) / batch) + 1
 
 # Result computation and auxiliary function "view"
-def compute(specification,start=0,end=len(images)-1,images=images):
+def compute(specification,start=0,end=len(images)-1,images=images, specname="./specification.imgql"):
     num_cores = 1 #multiprocessing.cpu_count()
     files = []
     specs = []
     for k in range(0, batches):
-        file, spec = specification(k)
+        file, spec = specification(k,specname)
         files.append(file)
         specs.append(spec)
         #print(spec)
@@ -89,49 +90,10 @@ def vlsave(image,var):
 def vlprint(var):
     return f'print "{var}" {var}'
 
-def specification(index):
+def specification(index, script_name):
     global batch
-    text = f'''
-
-let r = red(img)
-let g = green(img)
-let b = blue(img)
-let rb = red(base)
-let gb = green(base)
-let bb = blue(base)
-
-let exists(p) = volume(p) .>. 0
-let forall(p) = volume(p) .=. volume(tt)
-let forallin(x,p) = forall( (!x) | p)
-
-let door = (r =. 0) & (b =. 255) & (g =. 0)
-let floorNoDoor = (rb =. 255) & (bb =. 255) & (gb =. 255)
-let floor = floorNoDoor & (!door)
-let wall = !floor
-
-
-let mrRed = (r =. 255) & (b =. 0) & (g =. 0)
-let mrGreen = (r =. 0) & (b =. 0) & (g =. 255)
-
-let mrX = mrRed | mrGreen
-
-let initial1 = exists(mrRed & ((x =. 1) & (y =. 1))) .&. exists(mrGreen & ((x =. 1) & (y =. 2)))
-let initial2 = exists(mrRed & ((x =. 6) & (y =. 3))) .&. exists(mrGreen & ((x =. 1) & (y =. 4)))
-let wrong = exists(mrX & wall) .|. (!. (exists(mrRed) .&. exists(mrGreen)))
-let exit = (x =. 9) & (y >. 2) & (y <. 9)
-let pathToExit = (floor ~> exit)
-let canExit(mr) = forallin(mr,pathToExit)
-let sameRoom = forallin(mrGreen,(mrGreen|floor) ~> mrRed)
-
-let greenFlees = (!.wrong) .&. canExit(mrGreen) .&. (!.(canExit(mrRed)))
-let nearby = exists(mrRed & (N N mrGreen))
-
-let forbidden1 = greenFlees .|. wrong
-let forbidden2 = forbidden1 .|. (!. nearby)
-
-let final = exists(mrRed & exit) .&. exists(mrGreen & exit)
-
-'''
+    input_script = open(script_name, "r")
+    script_lines = input_script.read()
     new_text = ""
     filenames = [name for name in images[batch*index: batch*(index+1)]]
     for image_name in filenames:
@@ -150,7 +112,7 @@ let final = exists(mrRed & exit) .&. exists(mrGreen & exit)
                       "sameRoom_"+image_name,
                       "greenFlees_"+image_name,
                       "nearby_"+image_name]
-        new_text += f'''load img = "{datadir}/{image_name}"\n''' + text
+        new_text += f'''load img = "{datadir}/{image_name}"\n''' + script_lines
         new_text += f'''
         
             print "{string_set[0]}" initial1
@@ -175,32 +137,31 @@ let final = exists(mrRed & exit) .&. exists(mrGreen & exit)
 # {vlsave(image,"mrGreen")}
 # {vlsave(image,"pathToExit")}
 
+def orchestrate():
+    items = []
+    if (os.path.exists(cache)):    
+        with open(cache) as f:
+            items = json.load(f)
+    else:
+        items = compute(specification)
+        with open(cache, 'w') as f:
+            json.dump(items, f)    
 
+    # %%
 
-items = []
-if (os.path.exists(cache)):    
-    with open(cache) as f:
-        items = json.load(f)
-else:
-    items = compute(specification)
+    wrong = [ x["filename"] for x in items if len(x["results"].keys()) != 15 ]
+    # %%
+    rescued = compute(specification,images=wrong)
+
+    # %%
+
+    correct = [x for x in items if len(x["results"].keys()) == 15 ]
+    # %%
+
+    final = correct + rescued
+
     with open(cache, 'w') as f:
-        json.dump(items, f)    
-
-# %%
-
-wrong = [ x["filename"] for x in items if len(x["results"].keys()) != 15 ]
-# %%
-rescued = compute(specification,images=wrong)
-
-# %%
-
-correct = [x for x in items if len(x["results"].keys()) == 15 ]
-# %%
-
-final = correct + rescued
-
-with open("cache.json", 'w') as f:
-    json.dump(final, f)    
+        json.dump(final, f)    
 
 # %%
 

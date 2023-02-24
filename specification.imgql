@@ -1,0 +1,37 @@
+let r = red(img)
+let g = green(img)
+let b = blue(img)
+let rb = red(base)
+let gb = green(base)
+let bb = blue(base)
+
+let exists(p) = volume(p) .>. 0
+let forall(p) = volume(p) .=. volume(tt)
+let forallin(x,p) = forall( (!x) | p)
+
+let door = (r =. 0) & (b =. 255) & (g =. 0)
+let floorNoDoor = (rb =. 255) & (bb =. 255) & (gb =. 255)
+let floor = floorNoDoor & (!door)
+let wall = !floor
+
+
+let mrRed = (r =. 255) & (b =. 0) & (g =. 0)
+let mrGreen = (r =. 0) & (b =. 0) & (g =. 255)
+
+let mrX = mrRed | mrGreen
+
+let initial1 = exists(mrRed & ((x =. 1) & (y =. 1))) .&. exists(mrGreen & ((x =. 1) & (y =. 2)))
+let initial2 = exists(mrRed & ((x =. 6) & (y =. 3))) .&. exists(mrGreen & ((x =. 1) & (y =. 4)))
+let wrong = exists(mrX & wall) .|. (!. (exists(mrRed) .&. exists(mrGreen)))
+let exit = (x =. 9) & (y >. 2) & (y <. 9)
+let pathToExit = (floor ~> exit)
+let canExit(mr) = forallin(mr,pathToExit)
+let sameRoom = forallin(mrGreen,(mrGreen|floor) ~> mrRed)
+
+let greenFlees = (!.wrong) .&. canExit(mrGreen) .&. (!.(canExit(mrRed)))
+let nearby = exists(mrRed & (N N mrGreen))
+
+let forbidden1 = greenFlees .|. wrong
+let forbidden2 = forbidden1 .|. (!. nearby)
+
+let final = exists(mrRed & exit) .&. exists(mrGreen & exit)

@@ -1,3 +1,12 @@
+#ignore images
+*.png
+*.dll
+*.so
+./VoxLogicA
+CATLib_PngConverter/VoxLogicA_1.0-experimental_linux-x64
+*.a
+*.json
+
 #https://stackoverflow.com/questions/4278601/what-of-eclipse-project-metadata-can-i-safely-ignore-in-git-mercurial
 #https://github.com/github/gitignore/blob/main/Global/Eclipse.gitignore
 
@@ -189,4 +198,23 @@ src/test/java/io/github/contractautomata/maze/resources/twoagentsimages/png
 
 *__pycache__
 
-VoxLogicA
+maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+VoxLogicA_1.0-experimental_linux-x64.zip
+composition.data
+strategy.data
+src/main/python/io.github.contractautomata.maze/cache.json
+src/main/python/io.github.contractautomata.maze/output.txt
+src/main/python/io.github.contractautomata.maze/cache.json
+src/main/python/io.github.contractautomata.maze/cache.json
+VoxLogicA_1.0-experimental_linux-x64/RegionCalculus.imgql
+VoxLogicA_1.0-experimental_linux-x64/stdlib.imgql
+VoxLogicA_1.0-experimental_linux-x64/VoxLogicA
+VoxLogicA_1.0-experimental_linux-x64/createdump
+VoxLogicA/binaries/VoxLogicA_1.0-experimental_linux-x64/VoxLogicA
+VoxLogicA/binaries/VoxLogicA_1.0-experimental_linux-x64/RegionCalculus.imgql
+VoxLogicA/binaries/VoxLogicA_1.0-experimental_linux-x64/createdump
+.gitignore
+VoxLogicA/binaries/VoxLogicA_1.0-experimental_linux-x64/stdlib.imgql
+VoxLogicA_1.0-experimental_linux-x64/BINARY_LICENSE.txt
+runme.sh
+VoxLogicA/binaries/VoxLogicA_1.0-experimental_linux-x64/BINARY_LICENSE.txt
