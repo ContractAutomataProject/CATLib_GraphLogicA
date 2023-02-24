@@ -50,6 +50,9 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 	private static String outputCompositionPath = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/composition.data";
 	private static String inputCompositionPath = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/composition.data";
 
+	private static String forbiddenAttribute = "";
+	private static String finalAttribute = "";
+	private static String controllability = "1";
 	private final static PngConverter pdc = new PngConverter();
 	private final static AutDataConverter<CALabel> dc = new AutDataConverter<>(CALabel::new);
 
@@ -59,14 +62,17 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 				"where options are : \n" +
 				"-phase1 (compute the composition and generate the images) \n" +
 				"-phase2 (read the logs of voxlogica and perform the synthesis) \n"+
-				"-experiment [1|2|3] (select either experiment 1, 2 or 3)\n" +
+				"-experiment [1|2|3] (select the set-up of either experiment 1, 2 or 3)\n" +
 				"-gateCoordinates x y \n" +
 				"-position_agent_1 x y  \n" +
 				"-position_agent_2 x y \n" +
 				"-imagePath String (the path where the image is located) \n" +
 				"-outputCompositionPath String (the path where to store the composition) \n"+
 				"-inputCompositionPath String (the path where the composition has been stored) \n"+
-				"-voxLogica_output_path String (the path where the output of VoxLogica is located) ";
+				"-voxLogica_output_path String (the path where the output of VoxLogica is located) \n"+
+				"-forbiddenAttribute String (name of the forbidden attribute in the voxlogica log) \n"+
+				"-finalAttribute String (name of the final attribute in the voxlogica log) \n"+
+				"-controllability [1|2]  (1: agents controllable, gate uncontrollable - 2: gate controllable, agents uncontrollable)";
 
 		boolean phase1=false;
 		boolean phase2=false;
@@ -115,7 +121,33 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 				case "-experiment":
 					exp = args[++i];
 					break;
+				case "-forbiddenAttribute":
+					forbiddenAttribute = args[++i];
+					break;
+				case "-finalAttribute":
+					finalAttribute = args[++i];
+					break;
+				case "-controllability":
+					controllability = args[++i];
+					break;
 			}
+		}
+
+		if (exp.equals("1")) //first experiment: agents controllable, gate uncontrollable
+			controllability="1";
+		else if (exp.equals("2")||exp.equals("3"))
+			controllability="2"; //second and third experiment: agents uncontrollable, gate controllable
+
+		if (exp.equals("3")){
+			agent1coordinates="(0; 4; 0)";
+			agent2coordinates="(2; 4; 0)";
+			gateCoordinates="(4; 4; 0)";
+			path_to_image = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/trainExample.png";
+		}
+
+		if (forbiddenAttribute=="" || finalAttribute==""){
+			forbiddenAttribute="forbidden"+exp;
+			finalAttribute="final"+exp;
 		}
 
 		System.out.println("The set-up is:" +"\n"+
@@ -126,14 +158,12 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 				"imagePath="+path_to_image+"\n"+
 				"outputCompositionPath="+outputCompositionPath+"\n"+
 				"inputCompositionPath="+inputCompositionPath+"\n"+
-				"voxLogica_output_path="+path_to_voxlogica_output);
+				"voxLogica_output_path="+path_to_voxlogica_output+"\n"+
+				"forbiddenAttribute="+forbiddenAttribute+"\n"+
+				"finalAttribute="+finalAttribute+"\n"+
+				"controllability="+controllability+"\n");
 
-		if (exp.equals("3")){
-			agent1coordinates="(0; 4; 0)";
-			agent2coordinates="(2; 4; 0)";
-			gateCoordinates="(4; 4; 0)";
-			path_to_image = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/trainExample.png";
-		}
+
 
 		if (phase1) {
 			start = Instant.now();
@@ -306,18 +336,18 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 		final Set<String> initialstate = Set.of(agent1coordinates.replaceAll(";", ",")+","+agent2coordinates.replaceAll(";", ",")+",Driver,Close");
 
-		Set<String> finalstates=null;
-		Set<String> forbiddenstates=null;
+//		if (!exp.equals("3")) {
+//			String forbiddenkey = exp.equals("1") ? "forbidden1" : "forbidden2";
+//			finalstates = extractFromJSON(obj, exp.equals("1") ? "final" : forbiddenkey);
+//			forbiddenstates = extractFromJSON(obj, exp.equals("1") ? forbiddenkey : "final"); //in the second experiment final and forbidden are inverted
+//		}
+//		else {
+//				//final: 		trains in 10,2 and 10,4
+//				//forbidden: 	both trains right of the gate but no train has arrived yet
+//		}
 
-		if (!exp.equals("3")) {
-			String forbiddenkey = exp.equals("1") ? "forbidden1" : "forbidden2";
-			finalstates = extractFromJSON(obj, exp.equals("1") ? "final" : forbiddenkey);
-			forbiddenstates = extractFromJSON(obj, exp.equals("1") ? forbiddenkey : "final"); //in the second experiment final and forbidden are inverted
-		}
-		else {
-				//final: 		trains in 10,2 and 10,4
-				//forbidden: 	both trains right of the gate but no train has arrived yet
-		}
+		final Set<String> finalstates = extractFromJSON(obj, finalAttribute);
+		final Set<String> forbiddenstates = extractFromJSON(obj, forbiddenAttribute); //in the second experiment final and forbidden are inverted
 
 		finalstates.removeAll(forbiddenstates); //final states cannot be forbidden
 
@@ -326,13 +356,14 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		//reset initial and final states to false
 		RelabelingOperator<String,CALabel> ro = new RelabelingOperator<>(CALabel::new,x->x,x->false,x->false);
 
+		Modality agentModality = (controllability.equals("1"))?Modality.PERMITTED:Modality.URGENT;
+		Modality gateModality =  (controllability.equals("2"))?Modality.PERMITTED:Modality.URGENT;
 		System.out.println("Reset initial and final states, and selected agents to uncontrollable");
+
 		//turn the moves of the opponent to uncontrollable
 		Set<ModalTransition<String, Action, State<String>, CALabel>> setr = ro.apply(aut).parallelStream()
 				.map(t->new ModalTransition<>(t.getSource(),t.getLabel(),t.getTarget(),
-						(t.getLabel().getContent().get(3) instanceof IdleAction)?
-								(exp.equals("1")?Modality.PERMITTED: Modality.URGENT) //first experiment: agents controllable, gate uncontrollable
-								:(exp.equals("1")?Modality.URGENT: Modality.PERMITTED)//second and third experiment: agents uncontrollable, gate controllable
+						(t.getLabel().getContent().get(3) instanceof IdleAction)?agentModality:gateModality
 				)).collect(Collectors.toSet());
 
 		System.out.println("State Marking ... ");
