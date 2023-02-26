@@ -1,0 +1,28 @@
+let r = red(img)
+let g = green(img)
+let b = blue(img)
+let rb = red(base)
+let gb = green(base)
+let bb = blue(base)
+
+let exists(p) = volume(p) .>. 0
+let forall(p) = volume(p) .=. volume(tt)
+let forallin(x,p) = forall( (!x) | p)
+
+let door = (r =. 0) & (b =. 255) & (g =. 0)
+let floorNoDoor = (rb =. 255) & (bb =. 255) & (gb =. 255)
+let floor = floorNoDoor & (!door)
+let wall = !floor
+
+
+let mrRed = (r =. 255) & (b =. 0) & (g =. 0)
+let mrGreen = (r =. 0) & (b =. 0) & (g =. 255)
+
+let mrX = mrRed | mrGreen
+
+let initial1 = exists(mrRed & ((x =. 0) & (y =. 4))) .&. exists(mrGreen & ((x =. 2) & (y =. 4)))
+
+let forbidden1 = exists(mrRed & mrGreen & floor & x >.6)
+let exit = (x =. 11) & (y =. 4)
+
+let final = exists(mrRed & exit & !.wrong) .|. exists(mrGreen & exit & !.wrong)

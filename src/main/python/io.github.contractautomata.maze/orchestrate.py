@@ -19,23 +19,23 @@ except:
     basedir="."
 #%%
 
-##### Per VL ####
+# Default values
 baseimage = f'{basedir}/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/maze3.png'
-datadir = f'{basedir}/src/test/java/io/github/contractautomata/maze/resources/twoagentsimages/png'
-#### end ####
-images = [fname for fname in os.listdir(datadir) if fname.endswith(".png")]
+defaultdir = f'{basedir}/src/test/java/io/github/contractautomata/maze/resources/twoagentsimages/png'
+default_specification="./specification.imgql"
+images = []
 tmpdir = "./tmp"
 cache = "./cache.json"
 batch = 150
 batches = int(len(images) / batch) + 1
 
 # Result computation and auxiliary function "view"
-def compute(specification,start=0,end=len(images)-1,images=images, specname="./specification.imgql"):
+def compute(specification, specname, imagepath, datadir, start=0,end=len(images)-1,images=images):
     num_cores = 1 #multiprocessing.cpu_count()
     files = []
     specs = []
     for k in range(0, batches):
-        file, spec = specification(k,specname)
+        file, spec = specification(k,specname,imagepath, datadir)
         files.append(file)
         specs.append(spec)
         #print(spec)
@@ -59,7 +59,7 @@ def compute(specification,start=0,end=len(images)-1,images=images, specname="./s
 
     return voxlogica.simplify_results(voxlogica_output)
 
-def view(result,rows = 5,cols = 5,sizex = 20,sizey = 20):
+def view(result,rows = 5,cols = 5,sizex = 20,sizey = 20, datadir=defaultdir):
     fname = result["filename"]
     plt.figure(figsize=(sizex,sizey))
     img = mpimg.imread(f'{datadir}/{fname}')
@@ -90,16 +90,16 @@ def vlsave(image,var):
 def vlprint(var):
     return f'print "{var}" {var}'
 
-def specification(index, script_name):
+def specification(index, scriptname, imagepath, datadir):
     global batch
-    input_script = open(script_name, "r")
+    input_script = open(scriptname, "r")
     script_lines = input_script.read()
     new_text = ""
     filenames = [name for name in images[batch*index: batch*(index+1)]]
     for image_name in filenames:
         #print("inside spec")
         fname = f'''let filename = "{image_name}"'''
-        base_name = f'''load base ="{baseimage}"\n'''
+        base_name = f'''load base ="{imagepath}"\n'''
         new_text += fname
         new_text += base_name
         string_set = ["initial1_"+image_name,
@@ -137,13 +137,19 @@ def specification(index, script_name):
 # {vlsave(image,"mrGreen")}
 # {vlsave(image,"pathToExit")}
 
-def orchestrate():
+def orchestrate(specname, imagepath=baseimage, datadir=defaultdir):
+    global images
+    global default_specification
+    if specname == None:
+        specname = default_specification
+
+    images = [fname for fname in os.listdir(datadir) if fname.endswith(".png")]
     items = []
     if (os.path.exists(cache)):    
         with open(cache) as f:
             items = json.load(f)
     else:
-        items = compute(specification)
+        items = compute(specification, specname, imagepath, datadir)
         with open(cache, 'w') as f:
             json.dump(items, f)    
 
@@ -151,7 +157,7 @@ def orchestrate():
 
     wrong = [ x["filename"] for x in items if len(x["results"].keys()) != 15 ]
     # %%
-    rescued = compute(specification,images=wrong)
+    rescued = compute(specification, specname, imagepath, datadir, images=wrong)
 
     # %%
 
