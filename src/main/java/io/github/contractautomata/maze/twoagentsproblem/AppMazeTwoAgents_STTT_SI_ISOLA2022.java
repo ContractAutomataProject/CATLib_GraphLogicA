@@ -14,6 +14,7 @@ import io.github.contractautomata.catlib.converters.AutConverter;
 import io.github.contractautomata.catlib.converters.AutDataConverter;
 import io.github.contractautomata.catlib.operations.MSCACompositionFunction;
 import io.github.contractautomata.catlib.operations.MpcSynthesisOperator;
+import io.github.contractautomata.catlib.operations.OrchestrationSynthesisOperator;
 import io.github.contractautomata.catlib.operations.RelabelingOperator;
 import io.github.contractautomata.catlib.requirements.Agreement;
 import io.github.contractautomata.maze.converters.JSonConverter;
@@ -204,10 +205,15 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 			if (exp!="")
 				dc.exportMSCA("marked_"+exp,marked);
 
+			marked.getTransition().parallelStream()
+					.filter(t->t.isNecessary()&&t.getLabel().isOffer())
+							.forEach(System.out::println);
+
+			OrchestrationSynthesisOperator.setReachabilityLazy();
 
 			System.out.println("Start computing the synthesis at "+start);
 			Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy =
-					new MpcSynthesisOperator<String>(new Agreement()).apply(marked);
+					new OrchestrationSynthesisOperator<String>(new Agreement()).apply(marked);
 
 			stop = Instant.now();
 			elapsedTime = Duration.between(start, stop).toMillis();
@@ -355,15 +361,17 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		//reset initial and final states to false
 		RelabelingOperator<String,CALabel> ro = new RelabelingOperator<>(CALabel::new,x->x,x->false,x->false);
 
-		Modality agentModality = (controllability.equals("1"))?Modality.PERMITTED:Modality.URGENT;
+		Modality agentModality = (controllability.equals("1"))?Modality.PERMITTED:Modality.LAZY;
 		Modality gateModality =  (controllability.equals("2"))?Modality.PERMITTED:Modality.URGENT;
 		System.out.println("Reset initial and final states, and selected agents to uncontrollable");
 
 		//turn the moves of the opponent to uncontrollable
 		Set<ModalTransition<String, Action, State<String>, CALabel>> setr = ro.apply(aut).parallelStream()
 				.map(t->new ModalTransition<>(t.getSource(),t.getLabel(),t.getTarget(),
-						(t.getLabel().getContent().get(3) instanceof IdleAction)?agentModality:gateModality
+						(t.getLabel().getContent().get(3) instanceof IdleAction)&&t.getLabel().isMatch()?agentModality
+								:gateModality
 				)).collect(Collectors.toSet());
+
 
 		System.out.println("State Marking ... ");
 
