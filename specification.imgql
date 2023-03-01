@@ -31,7 +31,7 @@ let sameRoom = forallin(mrGreen,(mrGreen|floor) ~> mrRed)
 let greenFlees = (!.wrong) .&. canExit(mrGreen) .&. (!.(canExit(mrRed)))
 let nearby = exists(mrRed & (N N mrGreen))
 
-let forbidden1 = greenFlees .|. wrong
-let forbidden2 = forbidden1 .|. (!. nearby)
-
-let final = exists(mrRed & exit) .&. exists(mrGreen & exit)
+let forbidden1 = greenFlees .|. wrong .|. (!. nearby)
+let final1 = exists(mrRed & exit) .&. exists(mrGreen & exit)
+let final2 = greenFlees .|. wrong
+let forbidden2 = final1

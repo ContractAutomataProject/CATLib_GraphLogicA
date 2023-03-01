@@ -27,19 +27,24 @@ images = []
 tmpdir = "./tmp"
 cache = "./cache.json"
 batch = 150
-batches = int(len(images) / batch) + 1
+batches = 0
 
 # Result computation and auxiliary function "view"
-def compute(specification, specname, imagepath, datadir, start=0,end=len(images)-1,images=images):
-    num_cores = 1 #multiprocessing.cpu_count()
+def compute(specification, specname, imagepath, datadir, parimages):
+    global images
+    num_cores = 1
+    if parimages == None:
+        parimages = images
     files = []
     specs = []
+    print(batches)
+    print(len(parimages))
     for k in range(0, batches):
-        file, spec = specification(k,specname,imagepath, datadir)
+        print(batch*k)
+        file, spec = specification(k, specname, imagepath, datadir, parimages[batch*k: batch*(k+1)])
         files.append(file)
         specs.append(spec)
         #print(spec)
-    print("there are " + str(len(images)) + " images")  
     
     #print(batches)
 
@@ -48,7 +53,7 @@ def compute(specification, specname, imagepath, datadir, start=0,end=len(images)
         #global images
         start = i*batch
         #image_start = start
-        results = {"filename": files[0], "output": voxlogica.run_voxlogica(specs[i])}
+        results = {"filename": files[i], "output": voxlogica.run_voxlogica(specs[i])}
         print(results)
         #print(x['filename'])
         #print('done')
@@ -90,41 +95,41 @@ def vlsave(image,var):
 def vlprint(var):
     return f'print "{var}" {var}'
 
-def specification(index, scriptname, imagepath, datadir):
+def specification(index, scriptname, imagepath, datadir, parimages):
     global batch
     input_script = open(scriptname, "r")
     script_lines = input_script.read()
     new_text = ""
-    filenames = [name for name in images[batch*index: batch*(index+1)]]
+    filenames = [name for name in parimages]
     for image_name in filenames:
         #print("inside spec")
         fname = f'''let filename = "{image_name}"'''
         base_name = f'''load base ="{imagepath}"\n'''
         new_text += fname
         new_text += base_name
-        string_set = ["initial1_"+image_name,
-                      "initial2_"+image_name,
-                      "forbidden1_"+image_name,
-                      "forbidden2_"+image_name,
-                      "final_"+image_name,
+        string_set = [#"initial2_"+image_name,
+                      "initial3_"+image_name,
+                      #"forbidden1_"+image_name,
+                      "forbidden3_"+image_name,
+                      "final3_"+image_name,
                       "canExit(mrGreen)_"+image_name,
                       "wrong_"+image_name,
                       "sameRoom_"+image_name,
                       "greenFlees_"+image_name,
                       "nearby_"+image_name]
         new_text += f'''load img = "{datadir}/{image_name}"\n''' + script_lines
+            #print "{string_set[0]}" initial2
+            #print "{string_set[2]}" forbidden1
+            #print "{string_set[3]}" canExit(mrGreen)
+            #print "{string_set[4]}" wrong
+            #print "{string_set[5]}" sameRoom
+            #print "{string_set[6]}" greenFlees
+            #print "{string_set[7]}" nearby
         new_text += f'''
         
-            print "{string_set[0]}" initial1
-            print "{string_set[1]}" initial2
-            print "{string_set[2]}" forbidden1
-            print "{string_set[3]}" forbidden2
-            print "{string_set[4]}" final
-            print "{string_set[5]}" canExit(mrGreen)
-            print "{string_set[6]}" wrong
-            print "{string_set[7]}" sameRoom
-            print "{string_set[8]}" greenFlees
-            print "{string_set[9]}" nearby\n
+            print "{string_set[0]}" initial3
+            print "{string_set[1]}" forbidden3
+            print "{string_set[2]}" final3
 
             '''
     
@@ -140,10 +145,13 @@ def specification(index, scriptname, imagepath, datadir):
 def orchestrate(specname, imagepath=baseimage, datadir=defaultdir):
     global images
     global default_specification
+    global batches 
     if specname == None:
         specname = default_specification
 
     images = [fname for fname in os.listdir(datadir) if fname.endswith(".png")]
+    batches = int(len(images) / batch) + 1
+    print("There are " + str(len(images)) + "images in Orchestrate")
     items = []
     if (os.path.exists(cache)):    
         with open(cache) as f:
@@ -157,7 +165,7 @@ def orchestrate(specname, imagepath=baseimage, datadir=defaultdir):
 
     wrong = [ x["filename"] for x in items if len(x["results"].keys()) != 15 ]
     # %%
-    rescued = compute(specification, specname, imagepath, datadir, images=wrong)
+    rescued = compute(specification, specname, imagepath, datadir, images)
 
     # %%
 

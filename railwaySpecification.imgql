@@ -20,9 +20,20 @@ let mrGreen = (r =. 0) & (b =. 0) & (g =. 255)
 
 let mrX = mrRed | mrGreen
 
-let initial1 = exists(mrRed & ((x =. 0) & (y =. 4))) .&. exists(mrGreen & ((x =. 2) & (y =. 4)))
+let initial2 = exists(mrRed & ((x =. 0) & (y =. 4))) .&. exists(mrGreen & ((x =. 2) & (y =. 4)))
+let initial3 = exists(mrRed & ((x =. 0) & (y =. 4))) .&. exists(mrGreen & ((x =. 2) & (y =. 4)))
+let junction = (x >. 4) & (x <. 10) & floor
+let legal = (x <=. 4) & floor
+let exitLeft = (y =. 4) & (x =. 10)
+let exitRight = (y =. 1) & (x =. 10)
+let exitX = exitLeft | exitRight
+let exitMrX = mrX & exitX
+let legalMrX = mrX & legal
 
-let forbidden1 = exists(mrRed & mrGreen & floor & x >.6)
-let exit = (x =. 11) & (y =. 4)
+let combination1 = exists(mrRed & exitLeft) .&. exists(mrGreen & exitRight)
+let combination2 = exists(mrGreen & exitLeft) .&. exists(mrRed & exitRight)
 
-let final = exists(mrRed & exit & !.wrong) .|. exists(mrGreen & exit & !.wrong)
+let final3 = combination1 .|. combination2
+
+let forbidden3 = exists(mrRed & junction) .&. exists(mrGreen & junction)
+//.&. !.exists(legalMrX) .&. !.final3
