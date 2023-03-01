@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,6 +83,8 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 
 		System.out.println( "Maze example with two agents." );
+
+
 
 		if (args==null || args.length==0) {
 			System.out.println(message);
@@ -143,6 +146,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 			agent2coordinates="(2; 4; 0)";
 			gateCoordinates="(4; 4; 0)";
 			path_to_image = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/trainExample.png";
+			path_to_voxlogica_output = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/experimentsSTTTrailway.json";
 		}
 
 		if (forbiddenAttribute=="" || finalAttribute==""){
@@ -188,7 +192,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 			start = Instant.now();
 			System.out.println("Start marking automaton with voxlogica output at " + start);
-			System.out.println("Importing legal composition ");
+			System.out.println("Importing composition ");
 			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> comp = dc.importMSCA(inputCompositionPath);//loadFile("composition.data", false);
 
 			Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> marked = readVoxLogicaOutputAndMarkStates(comp,exp); //computing
@@ -197,11 +201,9 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 			elapsedTime = Duration.between(start, stop).toMillis();
 			System.out.println("Elapsed time " + elapsedTime + " ms");
 
-			dc.exportMSCA("twoagents_maze_marked_firstexp_new",marked);
+			if (exp!="")
+				dc.exportMSCA("marked_"+exp,marked);
 
-			marked.getStates().stream()
-					.filter(s->s.isFinalState())
-					.forEach(System.out::println);
 
 			System.out.println("Start computing the synthesis at "+start);
 			Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> strategy =
@@ -336,20 +338,17 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 		final Set<String> initialstate = Set.of(agent1coordinates.replaceAll(";", ",")+","+agent2coordinates.replaceAll(";", ",")+",Driver,Close");
 
-//		if (!exp.equals("3")) {
-//			String forbiddenkey = exp.equals("1") ? "forbidden1" : "forbidden2";
-//			finalstates = extractFromJSON(obj, exp.equals("1") ? "final" : forbiddenkey);
-//			forbiddenstates = extractFromJSON(obj, exp.equals("1") ? forbiddenkey : "final"); //in the second experiment final and forbidden are inverted
-//		}
-//		else {
-//				//final: 		trains in 10,2 and 10,4
-//				//forbidden: 	both trains right of the gate but no train has arrived yet
-//		}
 
-		final Set<String> finalstates = extractFromJSON(obj, finalAttribute);
-		final Set<String> forbiddenstates = extractFromJSON(obj, forbiddenAttribute); //in the second experiment final and forbidden are inverted
+		final Set<String> finalstatesCheck = extractFromJSON(obj, finalAttribute);
+		final Set<String> forbiddenstatesCheck = extractFromJSON(obj, forbiddenAttribute);
+
+		final Set<String> finalstates= markStatesExperiment3(aut,true);
+		final Set<String> forbiddenstates = markStatesExperiment3(aut,false);
 
 		finalstates.removeAll(forbiddenstates); //final states cannot be forbidden
+
+//		System.out.println(finalstates);
+//		System.out.println(forbiddenstates);
 
 		System.out.println("Updating the automaton");
 
@@ -426,5 +425,18 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 				.count());
 		if (true)
 			return;
+	}
+
+
+	private static Set<String> markStatesExperiment3(Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut, boolean fin){
+		final BiFunction<State<String>,Integer, Boolean> checkX = (s,i) -> {
+			int x = Integer.parseInt(s.getState().get(i).getState().split(";")[0].substring(1));
+			return (fin)?x>=9    //final states
+					:x>4 && x<9; //forbidden states
+		};
+		return aut.getStates().parallelStream()
+				.filter(s->checkX.apply(s,0)&&checkX.apply(s,1))
+				.map(JSonConverter.getstate::apply)
+				.collect(Collectors.toSet());
 	}
 }
