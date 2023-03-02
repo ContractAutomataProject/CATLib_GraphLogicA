@@ -84,6 +84,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 		System.out.println( "Maze example with two agents." );
 
+
 		if (args==null || args.length==0) {
 			System.out.println(message);
 			return;
@@ -246,7 +247,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		final State<String> stateDriver = new State<>(List.of(new BasicState<>("Driver",true,true)));
 		Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> driver =
 				new Automaton<>((exp.equals("3")?Stream.of("goup","godown","goright")
-												:Stream.of("goup","godown","goleft","goright"))
+						:Stream.of("goup","godown","goleft","goright"))
 						.map(s->new CALabel(1,0,new OfferAction(s)))
 						.map(act->new ModalTransition<>(stateDriver,act,stateDriver,Modality.PERMITTED))
 						.collect(Collectors.toSet()));
@@ -301,7 +302,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 	/**
 	 * this private method takes the composition automaton, where each state of the composition
 	 * is a tuple of the position of each agent and the door state, and generates for each state of the composition a json encoding image
-	 * of GraphLogica or a png where in the original starting image the positions of the two agents are emphasised with two 
+	 * of GraphLogica or a png where in the original starting image the positions of the two agents are emphasised with two
 	 * different colors (red and green) whilst the door is blue
 	 *
 	 */
@@ -354,15 +355,18 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		final Set<String> initialstate = Set.of(agent1coordinates.replaceAll(";", ",")+","+agent2coordinates.replaceAll(";", ",")+",Driver,Close");
 
 
-//		final Set<String> finalstates = extractFromJSON(obj, finalAttribute);
-//		final Set<String> forbiddenstates = extractFromJSON(obj, forbiddenAttribute);
+		final Set<String> finalstates = extractFromJSON(obj, finalAttribute);
+		final Set<String> forbiddenstates = extractFromJSON(obj, forbiddenAttribute);
 
-		final Set<String> finalstates = markStatesExperiment3(aut,true);
-		final Set<String> forbiddenstates = markStatesExperiment3(aut,false);
+		final Set<String> finalstatesC = markStatesExperiment3(aut,true);
+		final Set<String> forbiddenstatesC = markStatesExperiment3(aut,false);
+
+		System.out.println(finalstates.equals(finalstatesC));
+		System.out.println(forbiddenstates.equals(forbiddenstatesC));
 //		System.out.println("The final states are:"+finalstatesC);
 //		System.out.println("The final states marked by the JSON are:"+finalstates);
-//		System.out.println("The forbidden states are:"+forbiddenstatesC);
-//		System.out.println("The forbidden states marked by the JSON are:"+forbiddenstates);
+		System.out.println("The forbidden states are:"+forbiddenstatesC);
+		System.out.println("The forbidden states marked by the JSON are:"+forbiddenstates);
 
 		finalstates.removeAll(forbiddenstates); //final states cannot be forbidden
 
@@ -372,8 +376,8 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		//reset initial and final states to false
 		RelabelingOperator<String,CALabel> ro = new RelabelingOperator<>(CALabel::new,x->x,x->false,x->false);
 
-		Modality agentModality = (controllability.equals("1"))?Modality.PERMITTED:necessary;
-		Modality gateModality =  (controllability.equals("2"))?Modality.PERMITTED:necessary;
+		Modality agentModality = (controllability.equals("1"))?Modality.PERMITTED:necessary; //experiments 1
+		Modality gateModality =  (controllability.equals("2"))?Modality.PERMITTED:necessary; //experiments 2 and 3
 		System.out.println("Reset initial and final states, and selected agents to uncontrollable");
 
 		//turn the moves of the opponent to uncontrollable
@@ -402,7 +406,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 
 		BiPredicate<State<String>,Set<String>> pred =  (s,set) -> set.parallelStream()
-		//		.peek(x->{if (x.equals(initialstate.iterator().next()))  System.out.println(x+" ---- " + JSonConverter.getstate.apply(s));})
+				//		.peek(x->{if (x.equals(initialstate.iterator().next()))  System.out.println(x+" ---- " + JSonConverter.getstate.apply(s));})
 				.anyMatch(x->x.equals(JSonConverter.getstate.apply(s)));
 
 
@@ -451,10 +455,10 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		final Function<State<String>, Boolean> checkX = s -> {
 			int x_1 = Integer.parseInt(s.getState().get(0).getState().split(";")[0].substring(1));
 			int x_2 = Integer.parseInt(s.getState().get(1).getState().split(";")[0].substring(1));
-			boolean gateClosed = s.getState().get(0).getState().contains("Close");
+			boolean gateClosed = s.getState().get(3).getState().contains("Close");
 			boolean bothTrainsInsideJunction = x_1>4 && x_1 <9 && x_2>4 && x_2<9;
 			boolean openedGate = (x_1>0 && x_1<4) &&  //first train before the semaphore
-						x_2>4 && x_2<9 && // second train inside the junction area
+					x_2>4 && x_2<9 && // second train inside the junction area
 					!gateClosed; //the semaphore is green
 
 			return (fin)?x_1>=9 && x_2 >=9    //final states
