@@ -20,7 +20,10 @@ import java.util.stream.IntStream;
 
 public class AppGenerateInfo {
 
-    private final static String dir = System.getProperty("user.dir")+"/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/";
+
+    private final static PngConverter pdc = new PngConverter();
+    private static String path_to_image = System.getProperty("user.dir")+"/../IdeaProjects/CATLib_PngConverter/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/trainExample.png";
+    private final static String dir = System.getProperty("user.dir")+"/../IdeaProjects/CATLib_PngConverter/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/";
     private final static AutDataConverter<CALabel> dc = new AutDataConverter<>(CALabel::new);
 
     public static void main(String[] args) throws IOException {
@@ -35,8 +38,9 @@ public class AppGenerateInfo {
 
 
     private static void printAutomataInfo() throws IOException {
-
-        List.of("agent","twoagents_maze","two_agents_maze_legal","two_agents_maze_marked_firstexp", "two_agents_maze_marked_secondexp","strategy")
+//        Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>>  railway = pdc.importMSCA(path_to_image);
+//        dc.exportMSCA(dir+"agentRailway",railway);
+         List.of("agent","agentRailway","composition_1","composition_2","composition_3", "marked_1","marked_2","marked_3","strategy_1","strategy_3")
                 .forEach(s->{
                     try {
                         Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut = dc.importMSCA(dir+s+ ".data");

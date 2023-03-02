@@ -84,6 +84,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 		System.out.println( "Maze example with two agents." );
 
+
 		if (args==null || args.length==0) {
 			System.out.println(message);
 			return;
@@ -354,15 +355,18 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		final Set<String> initialstate = Set.of(agent1coordinates.replaceAll(";", ",")+","+agent2coordinates.replaceAll(";", ",")+",Driver,Close");
 
 
-//		final Set<String> finalstates = extractFromJSON(obj, finalAttribute);
-//		final Set<String> forbiddenstates = extractFromJSON(obj, forbiddenAttribute);
+		final Set<String> finalstates = extractFromJSON(obj, finalAttribute);
+		final Set<String> forbiddenstates = extractFromJSON(obj, forbiddenAttribute);
 
-		final Set<String> finalstates = markStatesExperiment3(aut,true);
-		final Set<String> forbiddenstates = markStatesExperiment3(aut,false);
+		final Set<String> finalstatesC = markStatesExperiment3(aut,true);
+		final Set<String> forbiddenstatesC = markStatesExperiment3(aut,false);
+
+		System.out.println(finalstates.equals(finalstatesC));
+		System.out.println(forbiddenstates.equals(forbiddenstatesC));
 //		System.out.println("The final states are:"+finalstatesC);
 //		System.out.println("The final states marked by the JSON are:"+finalstates);
-//		System.out.println("The forbidden states are:"+forbiddenstatesC);
-//		System.out.println("The forbidden states marked by the JSON are:"+forbiddenstates);
+		System.out.println("The forbidden states are:"+forbiddenstatesC);
+		System.out.println("The forbidden states marked by the JSON are:"+forbiddenstates);
 
 		finalstates.removeAll(forbiddenstates); //final states cannot be forbidden
 
