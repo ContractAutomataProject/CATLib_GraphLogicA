@@ -84,7 +84,6 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 		System.out.println( "Maze example with two agents." );
 
-
 		if (args==null || args.length==0) {
 			System.out.println(message);
 			return;
@@ -355,11 +354,11 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		final Set<String> initialstate = Set.of(agent1coordinates.replaceAll(";", ",")+","+agent2coordinates.replaceAll(";", ",")+",Driver,Close");
 
 
-		final Set<String> finalstates = extractFromJSON(obj, finalAttribute);
-		final Set<String> forbiddenstates = extractFromJSON(obj, forbiddenAttribute);
+//		final Set<String> finalstates = extractFromJSON(obj, finalAttribute);
+//		final Set<String> forbiddenstates = extractFromJSON(obj, forbiddenAttribute);
 
-//		final Set<String> finalstatesC= markStatesExperiment3(aut,true);
-//		final Set<String> forbiddenstatesC = markStatesExperiment3(aut,false);
+		final Set<String> finalstates = markStatesExperiment3(aut,true);
+		final Set<String> forbiddenstates = markStatesExperiment3(aut,false);
 //		System.out.println("The final states are:"+finalstatesC);
 //		System.out.println("The final states marked by the JSON are:"+finalstates);
 //		System.out.println("The forbidden states are:"+forbiddenstatesC);
@@ -449,13 +448,20 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 
 	private static Set<String> markStatesExperiment3(Automaton<String, Action, State<String>, ModalTransition<String,Action,State<String>,CALabel>> aut, boolean fin){
-		final BiFunction<State<String>,Integer, Boolean> checkX = (s,i) -> {
-			int x = Integer.parseInt(s.getState().get(i).getState().split(";")[0].substring(1));
-			return (fin)?x>=9    //final states
-					:x>4 && x<9; //forbidden states
+		final Function<State<String>, Boolean> checkX = s -> {
+			int x_1 = Integer.parseInt(s.getState().get(0).getState().split(";")[0].substring(1));
+			int x_2 = Integer.parseInt(s.getState().get(1).getState().split(";")[0].substring(1));
+			boolean gateClosed = s.getState().get(0).getState().contains("Close");
+			boolean bothTrainsInsideJunction = x_1>4 && x_1 <9 && x_2>4 && x_2<9;
+			boolean openedGate = (x_1>0 && x_1<4) &&  //first train before the semaphore
+						x_2>4 && x_2<9 && // second train inside the junction area
+					!gateClosed; //the semaphore is green
+
+			return (fin)?x_1>=9 && x_2 >=9    //final states
+					:bothTrainsInsideJunction || openedGate ; //forbidden states
 		};
 		return aut.getStates().parallelStream()
-				.filter(s->checkX.apply(s,0)&&checkX.apply(s,1))
+				.filter(s->checkX.apply(s))
 				.map(JSonConverter.getstate::apply)
 				.collect(Collectors.toSet());
 	}
