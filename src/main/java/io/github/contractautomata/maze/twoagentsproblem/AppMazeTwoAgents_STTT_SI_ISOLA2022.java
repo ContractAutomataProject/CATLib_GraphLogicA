@@ -372,8 +372,8 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		//reset initial and final states to false
 		RelabelingOperator<String,CALabel> ro = new RelabelingOperator<>(CALabel::new,x->x,x->false,x->false);
 
-		Modality agentModality = (controllability.equals("1"))?Modality.PERMITTED:necessary;
-		Modality gateModality =  (controllability.equals("2"))?Modality.PERMITTED:necessary;
+		Modality agentModality = (controllability.equals("1"))?Modality.PERMITTED:necessary; //experiments 1
+		Modality gateModality =  (controllability.equals("2"))?Modality.PERMITTED:necessary; //experiments 2 and 3
 		System.out.println("Reset initial and final states, and selected agents to uncontrollable");
 
 		//turn the moves of the opponent to uncontrollable
@@ -451,7 +451,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		final Function<State<String>, Boolean> checkX = s -> {
 			int x_1 = Integer.parseInt(s.getState().get(0).getState().split(";")[0].substring(1));
 			int x_2 = Integer.parseInt(s.getState().get(1).getState().split(";")[0].substring(1));
-			boolean gateClosed = s.getState().get(0).getState().contains("Close");
+			boolean gateClosed = s.getState().get(3).getState().contains("Close");
 			boolean bothTrainsInsideJunction = x_1>4 && x_1 <9 && x_2>4 && x_2<9;
 			boolean openedGate = (x_1>0 && x_1<4) &&  //first train before the semaphore
 						x_2>4 && x_2<9 && // second train inside the junction area
