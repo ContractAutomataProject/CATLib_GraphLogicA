@@ -62,6 +62,7 @@ if args.imagePath:
     image_path = args.imagePath
 else:
     image_path = "./maze3.png"
+png_dir_path = "./png"
 #subprocess.run(["java", "-jar", jar_file_path, "-phase1", "-imagepath", image_path])
 
 # Copy files to the specified directory
@@ -70,9 +71,9 @@ if args.outputCompositionPath:
 else:
     dir_path = "src/test/java/io/github/contractautomata/maze/resources/twoagentsimages/png"
 
-png_dir_path = "./png"
 #if os.path.exists(dir_path):
 #    shutil.rmtree(dir_path)
+
 #shutil.copytree(png_dir_path, dir_path)
 
-orchestrate.orchestrate(args.specification, image_path, dir_path)
+orchestrate.orchestrate(args.specification, args.experiment, image_path, dir_path)

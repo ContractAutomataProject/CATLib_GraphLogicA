@@ -30,7 +30,7 @@ batch = 150
 batches = 0
 
 # Result computation and auxiliary function "view"
-def compute(specification, specname, imagepath, datadir, parimages):
+def compute(specification, exp, specname, imagepath, datadir, parimages):
     global images
     num_cores = 1
     if parimages == None:
@@ -41,7 +41,7 @@ def compute(specification, specname, imagepath, datadir, parimages):
     print(len(parimages))
     for k in range(0, batches):
         print(batch*k)
-        file, spec = specification(k, specname, imagepath, datadir, parimages[batch*k: batch*(k+1)])
+        file, spec = specification(k, exp, specname, imagepath, datadir, parimages[batch*k: batch*(k+1)])
         files.append(file)
         specs.append(spec)
         #print(spec)
@@ -95,11 +95,12 @@ def vlsave(image,var):
 def vlprint(var):
     return f'print "{var}" {var}'
 
-def specification(index, scriptname, imagepath, datadir, parimages):
+def specification(index, exp, scriptname, imagepath, datadir, parimages):
     global batch
     input_script = open(scriptname, "r")
     script_lines = input_script.read()
     new_text = ""
+    print(scriptname)
     filenames = [name for name in parimages]
     for image_name in filenames:
         #print("inside spec")
@@ -107,30 +108,32 @@ def specification(index, scriptname, imagepath, datadir, parimages):
         base_name = f'''load base ="{imagepath}"\n'''
         new_text += fname
         new_text += base_name
-        string_set = [#"initial2_"+image_name,
-                      "initial3_"+image_name,
-                      #"forbidden1_"+image_name,
-                      "forbidden3_"+image_name,
-                      "final3_"+image_name,
-                      "canExit(mrGreen)_"+image_name,
-                      "wrong_"+image_name,
+        string_set = ["initial" + str(exp) + "_" + image_name,
+                      "forbidden" + str(exp) + "_" + image_name,
+                      "final" + str(exp) + "_" + image_name,
+                      "canExit(mrGreen)_" + image_name,
+                      "wrong_" + image_name,
                       "sameRoom_"+image_name,
                       "greenFlees_"+image_name,
                       "nearby_"+image_name]
         new_text += f'''load img = "{datadir}/{image_name}"\n''' + script_lines
-            #print "{string_set[0]}" initial2
-            #print "{string_set[2]}" forbidden1
-            #print "{string_set[3]}" canExit(mrGreen)
-            #print "{string_set[4]}" wrong
-            #print "{string_set[5]}" sameRoom
-            #print "{string_set[6]}" greenFlees
-            #print "{string_set[7]}" nearby
-        new_text += f'''
-        
-            print "{string_set[0]}" initial3
-            print "{string_set[1]}" forbidden3
-            print "{string_set[2]}" final3
-
+            
+        if exp != 3:
+            new_text += f'''
+                print "{string_set[0]}" initial{exp}
+                print "{string_set[1]}" forbidden{exp}
+                print "{string_set[2]}" final{exp}
+                print "{string_set[3]}" canExit(mrGreen)
+                print "{string_set[4]}" wrong
+                print "{string_set[5]}" sameRoom
+                print "{string_set[6]}" greenFlees
+                print "{string_set[7]}" nearby
+            '''
+        else:
+            new_text += f'''
+                print "{string_set[0]}" initial3
+                print "{string_set[1]}" forbidden3
+                print "{string_set[2]}" final3
             '''
     
     return filenames, new_text
@@ -142,7 +145,7 @@ def specification(index, scriptname, imagepath, datadir, parimages):
 # {vlsave(image,"mrGreen")}
 # {vlsave(image,"pathToExit")}
 
-def orchestrate(specname, imagepath=baseimage, datadir=defaultdir):
+def orchestrate(specname, exp, imagepath=baseimage, datadir=defaultdir,):
     global images
     global default_specification
     global batches 
@@ -165,7 +168,7 @@ def orchestrate(specname, imagepath=baseimage, datadir=defaultdir):
 
     wrong = [ x["filename"] for x in items if len(x["results"].keys()) != 15 ]
     # %%
-    rescued = compute(specification, specname, imagepath, datadir, images)
+    rescued = compute(specification, exp, specname, imagepath, datadir, images)
 
     # %%
 

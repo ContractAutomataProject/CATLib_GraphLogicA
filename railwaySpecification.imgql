@@ -22,16 +22,17 @@ let mrX = mrRed | mrGreen
 
 let initial2 = exists(mrRed & ((x =. 0) & (y =. 4))) .&. exists(mrGreen & ((x =. 2) & (y =. 4)))
 let initial3 = exists(mrRed & ((x =. 0) & (y =. 4))) .&. exists(mrGreen & ((x =. 2) & (y =. 4)))
-let junction = (x >. 4) & (x <. 10) & floor
+let junction = (x >. 4) & (x <. 9) & floor
 let legal = (x <=. 4) & floor
 let exitLeft = (y =. 4) & (x =. 10)
 let exitRight = (y =. 1) & (x =. 10)
 let exitX = exitLeft | exitRight
 let exitMrX = mrX & exitX
 let legalMrX = mrX & legal
+let outOfJunction = (x >. 8) & (x <. 11) & floor
 
-let combination1 = exists(mrRed & exitLeft) .&. exists(mrGreen & exitRight)
-let combination2 = exists(mrGreen & exitLeft) .&. exists(mrRed & exitRight)
+let combination1 = exists(mrRed & outOfJunction) .&. exists(mrGreen & outOfJunction)
+let combination2 = exists(mrGreen & outOfJunction) .&. exists(mrRed & outOfJunction)
 
 let final3 = combination1 .|. combination2
 
