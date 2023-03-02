@@ -358,15 +358,31 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 		final Set<String> finalstates = extractFromJSON(obj, finalAttribute);
 		final Set<String> forbiddenstates = extractFromJSON(obj, forbiddenAttribute);
 
-		final Set<String> finalstatesC = markStatesExperiment3(aut,true);
-		final Set<String> forbiddenstatesC = markStatesExperiment3(aut,false);
+//		final Set<String> finalstatesC = markStatesExperiment3(aut,true);
+//		final Set<String> forbiddenstatesC = markStatesExperiment3(aut,false);
 
-		System.out.println(finalstates.equals(finalstatesC));
-		System.out.println(forbiddenstates.equals(forbiddenstatesC));
-//		System.out.println("The final states are:"+finalstatesC);
+		//		System.out.println("The final states are:"+finalstatesC);
 //		System.out.println("The final states marked by the JSON are:"+finalstates);
-		System.out.println("The forbidden states are:"+forbiddenstatesC);
-		System.out.println("The forbidden states marked by the JSON are:"+forbiddenstates);
+//		System.out.println(finalstates.size());
+	//	System.out.println(forbiddenstatesC.size());
+
+//		System.out.println(finalstates.equals(finalstatesC));
+//		System.out.println(forbiddenstates.equals(forbiddenstatesC));
+//		System.out.println("The forbidden states are:"+forbiddenstatesC);
+//		System.out.println("The forbidden states marked by the JSON are:"+forbiddenstates);
+
+//
+//		System.out.println("Stati che sono forbidden nel JSON ma non dovrebbero esserlo: \n"+
+//				forbiddenstates.parallelStream()
+//						.filter(s->!forbiddenstatesC.contains(s))
+//										.collect(Collectors.joining("\n")));
+//
+//		System.out.println("Stati che sono forbidden ma non lo sono nel JSON: \n"+
+//				forbiddenstatesC.parallelStream()
+//						.filter(s->!forbiddenstates.contains(s))
+//						.collect(Collectors.joining("\n")));
+//
+
 
 		finalstates.removeAll(forbiddenstates); //final states cannot be forbidden
 
