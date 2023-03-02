@@ -9,11 +9,10 @@ let exists(p) = volume(p) .>. 0
 let forall(p) = volume(p) .=. volume(tt)
 let forallin(x,p) = forall( (!x) | p)
 
-let door = (r =. 0) & (b =. 255) & (g =. 0)
-let floorNoDoor = (rb =. 255) & (bb =. 255) & (gb =. 255)
-let floor = floorNoDoor & (!door)
+let gate = (r =. 0) & (b =. 255) & (g =. 0)
+let floorNoDoor = (r =. 255) & (b =. 255) & (g =. 255)
+let floor = floorNoDoor & (!gate)
 let wall = !floor
-
 
 let mrRed = (r =. 255) & (b =. 0) & (g =. 0)
 let mrGreen = (r =. 0) & (b =. 0) & (g =. 255)
@@ -22,19 +21,17 @@ let mrX = mrRed | mrGreen
 
 let initial2 = exists(mrRed & ((x =. 0) & (y =. 4))) .&. exists(mrGreen & ((x =. 2) & (y =. 4)))
 let initial3 = exists(mrRed & ((x =. 0) & (y =. 4))) .&. exists(mrGreen & ((x =. 2) & (y =. 4)))
-let junction = (x >. 4) & (x <. 9) & floor
-let legal = (x <=. 4) & floor
-let exitLeft = (y =. 4) & (x =. 10)
-let exitRight = (y =. 1) & (x =. 10)
-let exitX = exitLeft | exitRight
-let exitMrX = mrX & exitX
-let legalMrX = mrX & legal
-let outOfJunction = (x >. 8) & (x <. 11) & floor
+let junction = (x >. 4) & (x <. 9)
+let out = (x >.0) & (x <. 4)
+let outOfJunction = (x >. 8) & (x <. 11)
+let gateOpen = (floor & x =. 4)
+let gOp1 = exists(gateOpen) .&. exists(mrRed & out) .&. exists(mrGreen & junction)
+let gOp2 = exists(gateOpen) .&. exists(mrGreen & out) .&. exists(mrRed & junction)
+let wrongSignal = gOp1 .|. gOp2
 
 let combination1 = exists(mrRed & outOfJunction) .&. exists(mrGreen & outOfJunction)
 let combination2 = exists(mrGreen & outOfJunction) .&. exists(mrRed & outOfJunction)
 
 let final3 = combination1 .|. combination2
 
-let forbidden3 = exists(mrRed & junction) .&. exists(mrGreen & junction)
-//.&. !.exists(legalMrX) .&. !.final3
+let forbidden3 = (exists(mrRed & junction) .&. exists(mrGreen & junction)) .|. wrongSignal

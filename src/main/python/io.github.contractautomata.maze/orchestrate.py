@@ -100,14 +100,13 @@ def specification(index, exp, scriptname, imagepath, datadir, parimages):
     input_script = open(scriptname, "r")
     script_lines = input_script.read()
     new_text = ""
-    print(scriptname)
     filenames = [name for name in parimages]
     for image_name in filenames:
-        #print("inside spec")
         fname = f'''let filename = "{image_name}"'''
         base_name = f'''load base ="{imagepath}"\n'''
         new_text += fname
         new_text += base_name
+        new_text += f'''load img = "{datadir}/{image_name}"\n''' + script_lines
         string_set = ["initial" + str(exp) + "_" + image_name,
                       "forbidden" + str(exp) + "_" + image_name,
                       "final" + str(exp) + "_" + image_name,
@@ -116,7 +115,6 @@ def specification(index, exp, scriptname, imagepath, datadir, parimages):
                       "sameRoom_"+image_name,
                       "greenFlees_"+image_name,
                       "nearby_"+image_name]
-        new_text += f'''load img = "{datadir}/{image_name}"\n''' + script_lines
             
         if exp != 3:
             new_text += f'''
@@ -135,7 +133,12 @@ def specification(index, exp, scriptname, imagepath, datadir, parimages):
                 print "{string_set[1]}" forbidden3
                 print "{string_set[2]}" final3
             '''
-    
+            if image_name == "(0, 4, 0),(8, 4, 0),Driver,Open.png":
+                new_text += f'''
+                    save "./output/gateopen.png" gateOpen  
+                    save "./output/floor.png" floor 
+                    save "./output/img.png" img
+                '''
     return filenames, new_text
 
 
