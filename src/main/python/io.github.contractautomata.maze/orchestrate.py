@@ -133,12 +133,7 @@ def specification(index, exp, scriptname, imagepath, datadir, parimages):
                 print "{string_set[1]}" forbidden3
                 print "{string_set[2]}" final3
             '''
-            if image_name == "(0, 4, 0),(8, 4, 0),Driver,Open.png":
-                new_text += f'''
-                    save "./output/gateopen.png" gateOpen  
-                    save "./output/floor.png" floor 
-                    save "./output/img.png" img
-                '''
+
     return filenames, new_text
 
 
