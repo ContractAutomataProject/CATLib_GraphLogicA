@@ -5,14 +5,10 @@ enforcing spatial properties on a topological graph.
 
 This software has been developed for to the publication "An Experimental Toolchain for Strategy Synthesis with Spatial Properties", by Davide Basile, Maurice H. ter Beek & Vincenzo Ciancia, published in the Proceeding of the 11th International Symposium on Leveraging Applications of Formal Methods, Verification and Validation,  Adaptation and Learning.  ISoLA 2022, Rhodes, Greece, October 22–30, 2022,  Part III, https://doi.org/10.1007/978-3-031-19759-8_10 
 
-## Getting Started
-
-The latest release contains both the jars for reproducing the experiments of STTT SI Isola 2022 (file maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar) 
-and the experiments of Isola 2022 (file maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar). 
-
-OpenJDK11 or  a compatible version is required.
 
 ## STTT S.I. ISOLA 2022
+
+The latest release contains the jars for reproducing the experiments of STTT SI Isola 2022 (file maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar). 
 
 For reproducing the experiments of CATLib described in our paper submitted to STTT Special Issue of ISOLA2022, download the latest jar release, and launch it with:
 
@@ -22,14 +18,18 @@ and follow the instructions. The executable class is located under `src/main/jav
 The resources are located inside the folder `/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/`. 
 The executable jar is equipped with an option to use the set-up of the experiments described in the paper.
 
+OpenJDK11 or  a compatible version is required.
 
 ## Isola 2022 experiments
-For reproducing the experiments of CATLib described in our paper accepted  at ISOLA2022, download the latest jar release, and launch it with:
+
+The previous release contains the jar for reproducing  the experiments of Isola 2022 (file maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar). 
+For reproducing the experiments of CATLib described in our paper accepted  at ISOLA2022, download the previous (May 2022) jar release, and launch it with:
 
 `java -jar  maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar`
 
 and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents_ISOLA2022.java`.
 The release also contains the log of reproduction of the jar with the various options. 
+OpenJDK11 or  a compatible version is required.
 
 
 For running VoxLogicA, first copy the png images generated from the previous step into 
@@ -41,6 +41,7 @@ Then download VoxLogicA 1.0 from here:
 https://github.com/vincenzoml/VoxLogicA/releases/tag/v1.0-experimental 
 
 and unzip it into `src/main/python/io.github.contractautomata.maze/VoxLogicA/binaries` (create the directory `VoxLogicA/binaries` if it does not exist). Then run the python script `src/main/python/io.github.contractautomata.maze/orchestrate.py` which generates a file called `cache.json`. A copy of this file is shipped in the root directory of the aforementioned jar file, with path `experiment2.json` and can be replaced. 
+
 
 
 ## Video demo
