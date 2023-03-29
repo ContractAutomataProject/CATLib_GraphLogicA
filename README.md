@@ -6,7 +6,7 @@ enforcing spatial properties on a topological graph.
 This software has been developed for to the publication "An Experimental Toolchain for Strategy Synthesis with Spatial Properties", by Davide Basile, Maurice H. ter Beek & Vincenzo Ciancia, published in the Proceeding of the 11th International Symposium on Leveraging Applications of Formal Methods, Verification and Validation,  Adaptation and Learning.  ISoLA 2022, Rhodes, Greece, October 22–30, 2022,  Part III, https://doi.org/10.1007/978-3-031-19759-8_10 
 
 
-## STTT S.I. ISOLA 2022
+## STTT S.I. ISOLA 2022 experiments
 
 The latest release contains the jars for reproducing the experiments of STTT SI Isola 2022 (file maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar). 
 
@@ -20,7 +20,7 @@ The executable jar is equipped with an option to use the set-up of the experimen
 
 OpenJDK11 or  a compatible version is required.
 
-## Isola 2022 experiments
+## ISOLA 2022 experiments
 
 The previous release contains the jar for reproducing  the experiments of Isola 2022 (file maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar). 
 For reproducing the experiments of CATLib described in our paper accepted  at ISOLA2022, download the previous (May 2022) jar release, and launch it with:
