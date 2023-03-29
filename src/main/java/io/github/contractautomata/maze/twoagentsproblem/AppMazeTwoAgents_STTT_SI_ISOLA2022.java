@@ -59,7 +59,7 @@ public class AppMazeTwoAgents_STTT_SI_ISOLA2022
 
 	public static void main( String[] args ) throws Exception {
 
-		String message = "Usage : java -jar maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar [options] \n" +
+		String message = "Usage : java -jar maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar [options] \n" +
 				"where options are : \n" +
 				"-phase1 (compute the composition and generate the images) \n" +
 				"-phase2 (read the logs of voxlogica and perform the synthesis) \n"+

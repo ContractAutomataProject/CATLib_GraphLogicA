@@ -7,12 +7,30 @@ This software has been developed for to the publication "An Experimental Toolcha
 
 ## Getting Started
 
-For reproducing the experiments of CATLib described in our paper submitted to ISOLA2022, download the latest jar release, and launch it with:
+The latest release contains both the jars for reproducing the experiments of STTT SI Isola 2022 (file maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar) 
+and the experiments of Isola 2022 (file maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar). 
+
+OpenJDK11 or  a compatible version is required.
+
+## STTT S.I. ISOLA 2022
+
+For reproducing the experiments of CATLib described in our paper submitted to STTT Special Issue of ISOLA2022, download the latest jar release, and launch it with:
+
+`java -jar  maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar`
+
+and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents_STTT_SI_ISOLA2022.java`.
+The resources are located inside the folder `/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/`. 
+The executable jar is equipped with an option to use the set-up of the experiments described in the paper.
+
+
+## Isola 2022 experiments
+For reproducing the experiments of CATLib described in our paper accepted  at ISOLA2022, download the latest jar release, and launch it with:
 
 `java -jar  maze-0.0.1-SNAPSHOT-jar-with-dependencies.jar`
 
-and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents.java`.
-The release also contains the log of reproduction of the jar with the various options. OpenJDK11 or  a compatible version is required.
+and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents_ISOLA2022.java`.
+The release also contains the log of reproduction of the jar with the various options. 
+
 
 For running VoxLogicA, first copy the png images generated from the previous step into 
 
