@@ -15,7 +15,7 @@ For reproducing the experiments  described in our paper submitted to STTT Specia
 
 For reproducing the whole toolchain the script `CATLogica.py` is used.
 OpenJDK11 or a compatible version is required, python>3 is also required.
-It suffices to clone the repository and run the command:
+It suffices to clone the repository, the released jar, and run the command:
 
 `python3.X ./CATLogicA.py -experiment N -specification filename.imgql -imagePath originalImage.png`
 
