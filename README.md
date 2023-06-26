@@ -12,7 +12,9 @@ The latest release contains the jars for reproducing the experiments of STTT SI 
 
 For reproducing the experiments  described in our paper submitted to STTT Special Issue of ISOLA2022 follow the instructions below.
 
-For reproducing the whole toolchain the file `CATLogica.py` is used. It suffices to clone the repository and run the command:
+For reproducing the whole toolchain the file `CATLogica.py` is used. 
+OpenJDK11 or a compatible version is required, python>3 is also required.
+It suffices to clone the repository and run the command:
 
 `python3.X ./CATLogicA.py -experiment N -specification filename.imgql -imagePath originalImage.png`
 
@@ -26,10 +28,12 @@ Then the commands to be run are:
 
 `python3.X ./CATLogicA.py -experiment 3 -specification railwaySpecification.imgql -imagePath trainExample.png`
 
-OpenJDK11 or a compatible version is required, python >3 is also required.
 
 
-If you are interested in solely reproducing the part of the experiments related to CATLib, download the latest jar release, and launch it with:
+If you are interested in solely reproducing the part of the experiments related to CATLib, 
+OpenJDK11 or a compatible version is required (python is not required).
+
+Download the latest jar release, and launch it with:
 
 `java -jar  maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar`
 
