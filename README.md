@@ -8,11 +8,12 @@ This software has been developed for to the publication "An Experimental Toolcha
 
 ## STTT Special Issue ISOLA 2022 experiments
 
-The latest release contains the jars for reproducing the experiments of STTT SI Isola 2022 (file maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar), along with a Python orchestrator named `CATLogicA.py`. 
+The latest release contains the jars for reproducing the experiments of STTT SI Isola 2022 (file maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar). 
+The Python script named `CATLogicA.py` is available in the root of the repository.
 
 For reproducing the experiments  described in our paper submitted to STTT Special Issue of ISOLA2022 follow the instructions below.
 
-For reproducing the whole toolchain the file `CATLogica.py` is used. 
+For reproducing the whole toolchain the script `CATLogica.py` is used.
 OpenJDK11 or a compatible version is required, python>3 is also required.
 It suffices to clone the repository and run the command:
 
