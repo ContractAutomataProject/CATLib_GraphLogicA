@@ -8,17 +8,19 @@ This software has been developed for to the publication "An Experimental Toolcha
 
 ## STTT S.I. ISOLA 2022 experiments
 
-The latest release contains the jars for reproducing the experiments of STTT SI Isola 2022 (file maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar). 
+The latest release contains the jars for reproducing the experiments of STTT SI Isola 2022 (file maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar), along with a python orchestrator named CATLogicA.py. 
 
-For reproducing the experiments of CATLib described in our paper submitted to STTT Special Issue of ISOLA2022, download the latest jar release, and launch it with:
+For reproducing the experiments of CATLib described in our paper submitted to STTT Special Issue of ISOLA2022, it suffices to clone the repository and run the command:
 
-`java -jar  maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar`
+`python3.X ./CATLogicA.py -experiment N -specification filename.imgql -imagePath originalImage.png`
 
-and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents_STTT_SI_ISOLA2022.java`.
-The resources are located inside the folder `/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/`. 
-The executable jar is equipped with an option to use the set-up of the experiments described in the paper.
+where `N` is the experiment id, `filename.imgql` is the specification and `originalImage.png` is the image to analyse. Then the commands to be run are:
 
-OpenJDK11 or  a compatible version is required.
+`python3.X ./CATLogicA.py -experiment 1 -specification specification.imgql -imagePath maze.png`
+`python3.X ./CATLogicA.py -experiment 2 -specification specification.imgql -imagePath maze.png`
+`python3.X ./CATLogicA.py -experiment 3 -specification railwaySpecification.imgql -imagePath trainExample.png`
+
+OpenJDK11 or a compatible version is required, python >3 is also required.
 
 ## ISOLA 2022 experiments
 
