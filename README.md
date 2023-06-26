@@ -46,7 +46,6 @@ Download the latest jar release, and launch it with:
 
 and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents_STTT_SI_ISOLA2022.java`. 
 The executable jar is equipped with an option to use the set-up of the experiments described in the paper.
-OpenJDK11 or a compatible version is required.
 
 ## ISOLA 2022 experiments
 
