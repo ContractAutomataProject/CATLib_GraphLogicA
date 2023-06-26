@@ -9,24 +9,25 @@ sys.path.append(python_dir_path)
 import orchestrate
 import argparse
 
+#-phase1 (compute the composition and generate the images)\n
+#-phase2 (read the logs of voxlogica and perform the synthesis)
+#-position_agent_1 x y\n
+#-position_agent_2 x y\n
+#-gateCoordinates x y\n
+#-inputCompositionPath String (the path where the composition has been stored)\n
+#-forbiddenAttribute String (name of the forbidden attribute in the voxlogica log)\n
+#-finalAttribute String (name of the final attribute in the voxlogica log)\n
+#-controllability [1|2] (1: agents controllable, gate uncontrollable - 2: gate controllable, agents uncontrollable)
+#-jsonPath String (the path in where the VoxLogicA output is stored)
+#-outputCompositionPath String (the path where to store the composition)\n
+#-voxLogica_output_path String (the path where the output of VoxLogica is located)\n
+
 def usage():
     message = f'''
         Please specify the following arguments:\n
-        -phase1 (compute the composition and generate the images)\n
-        -phase2 (read the logs of voxlogica and perform the synthesis)
         -experiment [1|2|3] (select either experiment 1, 2 or 3)\n
-        -gateCoordinates x y\n
-        -position_agent_1 x y\n
-        -position_agent_2 x y\n
-        -imagePath String (the path where the image is located)\n
-        -outputCompositionPath String (the path where to store the composition)\n
-        -inputCompositionPath String (the path where the composition has been stored)\n
-        -voxLogica_output_path String (the path where the output of VoxLogica is located)\n
-        -forbiddenAttribute String (name of the forbidden attribute in the voxlogica log)\n
-        -finalAttribute String (name of the final attribute in the voxlogica log)\n
-        -controllability [1|2] (1: agents controllable, gate uncontrollable - 2: gate controllable, agents uncontrollable)
+        -imagePath String (the path where the image is located)\n     
         -specification String (the file containing the ImgQL specification)
-        -jsonPath String (the path in where the VoxLogicA output is stored)
     '''
 
 def pair(arg):
