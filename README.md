@@ -31,10 +31,11 @@ OpenJDK11 or a compatible version is required, python >3 is also required.
 
 If you are interested in solely reproducing the part of the experiments related to CATLib, download the latest jar release, and launch it with:
 
-java -jar  maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar
+`java -jar  maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar`
 
-and follow the instructions. The executable class is located under src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents_STTT_SI_ISOLA2022.java. The resources are located inside the folder /src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/. The executable jar is equipped with an option to use the set-up of the experiments described in the paper.
-
+and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents_STTT_SI_ISOLA2022.java`. 
+The resources are located inside the folder `/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/`. 
+The executable jar is equipped with an option to use the set-up of the experiments described in the paper.
 OpenJDK11 or a compatible version is required.
 
 ## ISOLA 2022 experiments
