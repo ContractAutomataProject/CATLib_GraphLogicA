@@ -21,19 +21,21 @@ In the main folder of the cloned repository (`CATLib_PngConverter`) create a dir
 
 For reproducing the whole toolchain the script `CATLogica.py` is used.
 OpenJDK11 or a compatible version is required, python>3 is also required.
-It suffices to clone the repository, the released jar, and run the command:
+It suffices to clone the repository, download the released jar in the same folder as `CATLogica.py`, and run the command:
 
-`python3.X ./CATLogicA.py -experiment N -specification filename.imgql -imagePath originalImage.png`
+`python3.X ./CATLogicA.py -experiment N -specification filename.imgql -imagePath pathToImg/originalImage.png`
 
 where `N` is the experiment id, `filename.imgql` is the specification and `originalImage.png` is the image to analyse. 
 
 Then the commands to be run are:
 
-`python3.X ./CATLogicA.py -experiment 1 -specification specification.imgql -imagePath maze.png`
+`python3.X ./CATLogicA.py -experiment 1 -specification specification.imgql -imagePath pathToImg/maze.png`
 
-`python3.X ./CATLogicA.py -experiment 2 -specification specification.imgql -imagePath maze.png`
+`python3.X ./CATLogicA.py -experiment 2 -specification specification.imgql -imagePath pathToImg/maze.png`
 
-`python3.X ./CATLogicA.py -experiment 3 -specification railwaySpecification.imgql -imagePath trainExample.png`
+`python3.X ./CATLogicA.py -experiment 3 -specification railwaySpecification.imgql -imagePath pathToImg/trainExample.png`
+
+The resources (including png images) are located inside the folder `/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/`.
 
 If you are interested in solely reproducing the part of the experiments related to CATLib, 
 OpenJDK11 or a compatible version is required (python is not required).
@@ -43,7 +45,6 @@ Download the latest jar release, and launch it with:
 `java -jar  maze-0.0.2-SNAPSHOT-jar-with-dependencies.jar`
 
 and follow the instructions. The executable class is located under `src/main/java/it/github/contractautomata/maze/twoagentsproblem/AppMazeTwoAgents_STTT_SI_ISOLA2022.java`. 
-The resources are located inside the folder `/src/main/java/io/github/contractautomata/maze/twoagentsproblem/resources/`. 
 The executable jar is equipped with an option to use the set-up of the experiments described in the paper.
 OpenJDK11 or a compatible version is required.
 
