@@ -13,6 +13,12 @@ The Python script named `CATLogicA.py` is available in the root of the repositor
 
 For reproducing the experiments  described in our paper submitted to STTT Special Issue of ISOLA2022 follow the instructions below.
 
+Download a VoxLogicA release:
+
+https://github.com/vincenzoml/VoxLogicA/releases
+
+In the main folder of the cloned repository (`CATLib_PngConverter`) create a directory `VoxLogicA/binaries` and unzip the archive there. The tool is now ready to be used.
+
 For reproducing the whole toolchain the script `CATLogica.py` is used.
 OpenJDK11 or a compatible version is required, python>3 is also required.
 It suffices to clone the repository, the released jar, and run the command:
@@ -28,8 +34,6 @@ Then the commands to be run are:
 `python3.X ./CATLogicA.py -experiment 2 -specification specification.imgql -imagePath maze.png`
 
 `python3.X ./CATLogicA.py -experiment 3 -specification railwaySpecification.imgql -imagePath trainExample.png`
-
-
 
 If you are interested in solely reproducing the part of the experiments related to CATLib, 
 OpenJDK11 or a compatible version is required (python is not required).
